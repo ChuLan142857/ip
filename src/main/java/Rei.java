@@ -60,6 +60,22 @@ public class Rei {
         System.out.println(line);
     }
 
+    private static void deleteTask(String input, ArrayList<Task> tasks, String line) throws ReiExceptions {
+
+        if (input.equals("delete")) {
+            throw new ReiExceptions("The delete command requires a task number.");
+        }
+
+        int index = parseIndex(input, 7, tasks.size());
+        Task removedTask = tasks.remove(index);
+
+        System.out.println(line);
+        System.out.println("Noted. I've removed this task:");
+        System.out.println(removedTask);
+        System.out.println("Now you have " + tasks.size() + " task(s) in the list.");
+        System.out.println(line);
+    }
+
     private static void markDone(String input, ArrayList<Task> tasks, String line)
             throws ReiExceptions {
 
@@ -149,6 +165,10 @@ public static void main(String[] args) {
 
                 if (userInput.startsWith("event")) {
                     addEvent(userInput, tasks, horizontal_line);
+                    continue;
+                }
+                if (userInput.startsWith("delete")){
+                    deleteTask(userInput, tasks, horizontal_line);
                     continue;
                 }
 
