@@ -65,7 +65,9 @@ public class Rei {
             }
 
             System.out.println(horizontal_line);
-            System.out.println("added: " + tasks.get(tasks.size() - 1));
+            System.out.println("Got it. I've added this task:");
+            System.out.println(tasks.get(tasks.size() - 1));
+            System.out.println("Now you have " + tasks.size() + " tasks in the list.");
             System.out.println(horizontal_line);
         }
 
