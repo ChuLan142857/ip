@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Rei {
     public static void main(String[] args) {
@@ -8,6 +9,7 @@ public class Rei {
             +horizontal_line);
 
         Scanner scanner = new Scanner(System.in);
+        ArrayList<String> items = new ArrayList<>();
 
         while(true){
             String userInput = scanner.nextLine();
@@ -17,7 +19,19 @@ public class Rei {
                 break;
             }
 
-            System.out.println(horizontal_line + userInput + "\n" + horizontal_line);
+            if(userInput.equals("list")){
+                System.out.println(horizontal_line);
+                for (int i = 0; i < items.size(); i++){
+                    System.out.println((i + 1) + ". " + items.get(i));
+                }
+                System.out.println(horizontal_line);
+                continue;
+            }
+
+            items.add(userInput);
+            System.out.println(horizontal_line);
+            System.out.println("added: " + userInput);
+            System.out.println(horizontal_line);
         }
 
         scanner.close();
