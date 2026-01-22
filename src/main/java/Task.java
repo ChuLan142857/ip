@@ -1,4 +1,4 @@
-public class Task {
+public abstract class Task {
     private String description;
     private boolean isDone;
 
@@ -25,8 +25,7 @@ public class Task {
     }
 
     @Override
-    public String toString()
-    {
+    public String toString(){
         return getStatusIcon() + " " + description;
     }
 }
