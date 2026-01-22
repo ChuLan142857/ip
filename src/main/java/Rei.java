@@ -9,8 +9,7 @@ public class Rei {
             +horizontal_line);
 
         Scanner scanner = new Scanner(System.in);
-        ArrayList<String> items = new ArrayList<>();
-        ArrayList<Boolean> isDone = new ArrayList<>();
+        ArrayList<Task> tasks = new ArrayList<>();
 
         while(true){
             String userInput = scanner.nextLine();
@@ -23,9 +22,8 @@ public class Rei {
             if(userInput.equals("list")){
                 System.out.println(horizontal_line);
                 System.out.println("Here are the tasks in your list:\n");
-                for (int i = 0; i < items.size(); i++){
-                    String status = isDone.get(i) ? "[X]" : "[]";
-                    System.out.println((i + 1) + ". " + status + " " + items.get(i));
+                for (int i = 0; i < tasks.size(); i++){
+                    System.out.println((i + 1) + ". " + tasks.get(i));
                 }
                 System.out.println(horizontal_line);
                 continue;
@@ -33,28 +31,30 @@ public class Rei {
 
             if(userInput.startsWith("mark ")){
                 int index = Integer.parseInt(userInput.substring(5)) - 1;
-                isDone.set(index, true);
+                Task task = tasks.get(index);
+                task.markDone();
 
                 System.out.println(horizontal_line);
                 System.out.println("Nice! I've marked this task as done:\n");
-                System.out.println("[X] " + items.get(index));
+                System.out.println(task);
                 System.out.println(horizontal_line);
                 continue;
             }
 
             if(userInput.startsWith("unmark ")){
                 int index = Integer.parseInt(userInput.substring(7)) - 1;
-                isDone.set(index, false);
+                Task task = tasks.get(index);
+                task.markUndone();
 
                 System.out.println(horizontal_line);
                 System.out.println("Ok, I've marked this task as not done yet:\n");
-                System.out.println("[ ] " + items.get(index));
+                System.out.println(task);
                 System.out.println(horizontal_line);
                 continue;
             }
 
-            items.add(userInput);
-            isDone.add(false);
+            Task task = new Task(userInput);
+            tasks.add(task);
 
             System.out.println(horizontal_line);
             System.out.println("added: " + userInput);
