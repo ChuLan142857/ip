@@ -53,11 +53,19 @@ public class Rei {
                 continue;
             }
 
-            Task task = new Task(userInput);
-            tasks.add(task);
+            if (userInput.startsWith("todo ")){
+                String desc = userInput.substring(5);
+                tasks.add(new Todo(desc));
+            } else if (userInput.startsWith("deadline ")){
+                String[] parts = userInput.substring(9).split(" /by ");
+                tasks.add(new Deadline(parts[0], parts[1]));
+            } else if (userInput.startsWith("event ")) {
+                String[] parts = userInput.substring(6).split(" /from | /to ");
+                tasks.add(new Event(parts[0], parts[1], parts[2]));
+            }
 
             System.out.println(horizontal_line);
-            System.out.println("added: " + userInput);
+            System.out.println("added: " + tasks.get(tasks.size() - 1));
             System.out.println(horizontal_line);
         }
 
