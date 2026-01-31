@@ -3,7 +3,7 @@ public class ByeCommand extends Command {
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showLine();
-        ui.show("Bye. Hope to see you again soon!");
+        ui.show("Bye. Have a nice day.");
         ui.showLine();
     }
 
