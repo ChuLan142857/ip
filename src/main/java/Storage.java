@@ -1,4 +1,5 @@
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Storage {
@@ -40,10 +41,11 @@ public class Storage {
         }
     }
 
-    public void save(ArrayList<Task> tasks) throws ReiExceptions {
+    public void save(TaskList tasks) throws ReiExceptions {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
-            for (Task task : tasks) {
+            ArrayList<Task> list = tasks.getAll();
+            for (Task task : list) {
                 writer.write(task.toFileString());
                 writer.newLine();
             }
@@ -53,30 +55,50 @@ public class Storage {
         }
     }
 
-    private Task parseTask(String line)
-    {
+    private Task parseTask(String line) throws ReiExceptions {
         String[] parts = line.split(" \\| ");
 
-        Task task = null;
         switch (parts[0]) {
             case "T":
-                task = new Todo(parts[2]);
-                break;
+                return loadTodo(parts);
             case "D":
-                task = new Deadline(parts[2], parts[3]);
-                break;
+                return loadDeadline(parts);
             case "E":
-                task = new Event(parts[2], parts[3], parts[4]);
-                break;
+                return loadEvent(parts);
             default:
-                return null;
+                throw new ReiExceptions("OOPS!!! Corrupted data file.");
         }
+    }
 
-        if (parts[1].equals("1")) {
+    private Task loadTodo(String[] parts)
+    {
+        Task t = new Todo(parts[2]);
+        setDone(t, parts[1]);
+        return t;
+    }
+
+    private Task loadDeadline(String[] parts)
+    {
+        LocalDateTime by = LocalDateTime.parse(parts[3]);
+        Task d = new Deadline(parts[2], by);
+        setDone(d, parts[1]);
+        return d;
+    }
+
+    private Task loadEvent(String[] parts)
+    {
+        LocalDateTime from = LocalDateTime.parse(parts[3]);
+        LocalDateTime to = LocalDateTime.parse(parts[4]);
+        Task e = new Event(parts[2], from, to);
+        setDone(e, parts[1]);
+        return e;
+    }
+
+    private void setDone(Task task, String doneFlag)
+    {
+        if (doneFlag.equals("1")) {
             task.markDone();
         }
-
-        return task;
     }
 }
 
