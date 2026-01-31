@@ -116,13 +116,24 @@ public class Rei {
 
 
 public static void main(String[] args) {
+
     String horizontal_line = "____________________________________________________________\n";
 
     System.out.println(horizontal_line + "Hello! I'm Rei.\n" + "What can I do for you?\n"
             + horizontal_line);
 
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Task> tasks = new ArrayList<>();
+        ArrayList<Task> tasks;
+        Storage storage = new Storage("./data/Rei.txt");
+
+        try {
+            tasks = storage.load();
+        } catch (ReiExceptions e){
+            System.out.println(horizontal_line);
+            System.out.println("Warning: Failed to load saved tasks.");
+            System.out.println(horizontal_line);
+            tasks = new ArrayList<>();
+        }
 
         while(true){
             try {
@@ -145,30 +156,36 @@ public static void main(String[] args) {
 
                 if (userInput.startsWith("mark ")) {
                     markDone(userInput, tasks, horizontal_line);
+                    storage.save(tasks);
                     continue;
                 }
 
                 if (userInput.startsWith("unmark ")) {
                     markUndone(userInput, tasks, horizontal_line);
+                    storage.save(tasks);
                     continue;
                 }
 
                 if (userInput.startsWith("todo")) {
                     addTodo(userInput, tasks, horizontal_line);
+                    storage.save(tasks);
                     continue;
                 }
 
                 if (userInput.startsWith("deadline")) {
                     addDeadline(userInput, tasks, horizontal_line);
+                    storage.save(tasks);
                     continue;
                 }
 
                 if (userInput.startsWith("event")) {
                     addEvent(userInput, tasks, horizontal_line);
+                    storage.save(tasks);
                     continue;
                 }
                 if (userInput.startsWith("delete")){
                     deleteTask(userInput, tasks, horizontal_line);
+                    storage.save(tasks);
                     continue;
                 }
 
