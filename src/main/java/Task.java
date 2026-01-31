@@ -16,8 +16,8 @@ public abstract class Task {
         isDone = false;
     }
 
-    public boolean isDone() {
-        return isDone;
+    public String getDoneFlag() {
+        return isDone ? "1" : "0";
     }
 
     public String getStatusIcon() {
@@ -27,5 +27,9 @@ public abstract class Task {
     @Override
     public String toString(){
         return getStatusIcon() + " " + description;
+    }
+
+    public String toFileString(){
+        return getDoneFlag() + " | " + description;
     }
 }
