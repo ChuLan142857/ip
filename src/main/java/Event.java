@@ -1,22 +1,31 @@
-public class Event extends Task {
-    private String from;
-    private  String to;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-    public Event(String description, String from, String to){
+public class Event extends Task {
+    private LocalDateTime start;
+    private LocalDateTime end;
+
+    public Event(String description, LocalDateTime start, LocalDateTime end){
         super(description);
-        this.from = from;
-        this.to = to;
+        this.start = start;
+        this.end = end;
     }
 
     @Override
     public String toString(){
         return "[E]" + super.toString()
-                + " (from: " + from + " to: " + to + ")";
+                + " (from: " + format(start) + " to: " + format(end) + ")";
     }
 
     @Override
     public String toFileString(){
         return "E | " + super.toFileString()
-                + " | " + from + " | " + to;
+                + " | " + start + " | " + end;
+    }
+
+    private String format(LocalDateTime dt)
+    {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy HH:mm");
+        return dt.format(formatter);
     }
 }
