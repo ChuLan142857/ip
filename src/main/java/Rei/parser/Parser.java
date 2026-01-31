@@ -1,5 +1,9 @@
+package Rei.parser;
+
+import Rei.exceptions.ReiExceptions;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import Rei.command.*;
 
 public class Parser {
 

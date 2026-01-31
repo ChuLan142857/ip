@@ -1,5 +1,11 @@
-import java.util.Scanner;
-import java.util.ArrayList;
+package Rei;
+
+import Rei.ui.Ui;
+import Rei.storage.Storage;
+import Rei.list.TaskList;
+import Rei.exceptions.ReiExceptions;
+import Rei.parser.Parser;
+import Rei.command.Command;
 
 public class Rei {
 

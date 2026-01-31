@@ -1,18 +1,29 @@
+package Rei.command;
+
+import Rei.task.*;
+import Rei.list.TaskList;
+import Rei.ui.Ui;
+import Rei.storage.Storage;
+import Rei.exceptions.ReiExceptions;
+
 import java.time.LocalDateTime;
 
-public class DeadlineCommand extends Command{
-    private final String description;
-    private final LocalDateTime ddl;
+public class EventCommand extends Command {
 
-    public DeadlineCommand(String description, LocalDateTime ddl) {
+    private final String description;
+    private final LocalDateTime start;
+    private final LocalDateTime end;
+
+    public EventCommand(String description, LocalDateTime start, LocalDateTime end) {
         this.description = description;
-        this.ddl = ddl;
+        this.start = start;
+        this.end = end;
     }
 
     @Override
     public void execute (TaskList tasks, Ui ui, Storage storage)
             throws ReiExceptions {
-        tasks.add(new Deadline(description, ddl));
+        tasks.add(new Event(description, start, end));
         storage.save(tasks);
 
         ui.showLine();
