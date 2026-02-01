@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * Command to create and add a new deadline task to the task list.
  * A deadline task must be completed by a specific date and time.
  */
-public class DeadlineCommand extends Command{
+public class DeadlineCommand extends Command {
     private final String description;
     private final LocalDateTime ddl;
 

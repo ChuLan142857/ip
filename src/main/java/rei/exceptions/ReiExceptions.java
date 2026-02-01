@@ -10,7 +10,7 @@ public class ReiExceptions extends Exception {
      *
      * @param message the detail message explaining the error condition
      */
-    public ReiExceptions(String message){
+    public ReiExceptions(String message) {
         super(message);
     }
 }
