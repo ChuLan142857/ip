@@ -1,11 +1,11 @@
-package Rei;
+package rei;
 
-import Rei.ui.Ui;
-import Rei.storage.Storage;
-import Rei.list.TaskList;
-import Rei.exceptions.ReiExceptions;
-import Rei.parser.Parser;
-import Rei.command.Command;
+import rei.ui.Ui;
+import rei.storage.Storage;
+import rei.list.TaskList;
+import rei.exceptions.ReiExceptions;
+import rei.parser.Parser;
+import rei.command.Command;
 
 public class Rei {
 

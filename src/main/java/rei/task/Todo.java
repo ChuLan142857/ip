@@ -1,4 +1,4 @@
-package Rei.task;
+package rei.task;
 
 public class Todo extends Task {
 

@@ -1,8 +1,8 @@
-package Rei.command;
+package rei.command;
 
-import Rei.list.TaskList;
-import Rei.ui.Ui;
-import Rei.storage.Storage;
+import rei.list.TaskList;
+import rei.ui.Ui;
+import rei.storage.Storage;
 
 public class ByeCommand extends Command {
 

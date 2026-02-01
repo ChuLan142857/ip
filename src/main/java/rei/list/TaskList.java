@@ -1,8 +1,8 @@
-package Rei.list;
+package rei.list;
 
 import java.util.ArrayList;
-import Rei.task.*;
-import Rei.exceptions.ReiExceptions;
+import rei.task.*;
+import rei.exceptions.ReiExceptions;
 
 public class TaskList {
     private final ArrayList<Task> tasks;

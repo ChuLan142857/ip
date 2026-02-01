@@ -1,4 +1,4 @@
-package Rei.task;
+package rei.task;
 
 public abstract class Task {
     private String description;
@@ -16,6 +16,10 @@ public abstract class Task {
 
     public void markUndone() {
         isDone = false;
+    }
+
+    public boolean isDone() {
+        return isDone;
     }
 
     public String getDoneFlag() {

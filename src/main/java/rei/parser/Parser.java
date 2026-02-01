@@ -1,9 +1,9 @@
-package Rei.parser;
+package rei.parser;
 
-import Rei.exceptions.ReiExceptions;
+import rei.exceptions.ReiExceptions;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import Rei.command.*;
+import rei.command.*;
 
 public class Parser {
 

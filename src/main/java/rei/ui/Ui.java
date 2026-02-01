@@ -1,4 +1,4 @@
-package Rei.ui;
+package rei.ui;
 
 import java.util.Scanner;
 

@@ -1,10 +1,10 @@
-package Rei.command;
+package rei.command;
 
-import Rei.task.*;
-import Rei.list.TaskList;
-import Rei.ui.Ui;
-import Rei.storage.Storage;
-import Rei.exceptions.ReiExceptions;
+import rei.task.*;
+import rei.list.TaskList;
+import rei.ui.Ui;
+import rei.storage.Storage;
+import rei.exceptions.ReiExceptions;
 
 import java.time.LocalDateTime;
 

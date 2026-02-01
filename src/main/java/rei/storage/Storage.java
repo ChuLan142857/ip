@@ -1,11 +1,11 @@
-package Rei.storage;
+package rei.storage;
 
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import Rei.task.*;
-import Rei.list.TaskList;
-import Rei.exceptions.ReiExceptions;
+import rei.task.*;
+import rei.list.TaskList;
+import rei.exceptions.ReiExceptions;
 
 public class Storage {
     private final String filePath;
