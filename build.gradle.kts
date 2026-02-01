@@ -34,6 +34,24 @@ application {
     mainClass = "rei.Rei"
 }
 
+// Configure JAR to be executable
+tasks.jar {
+    archiveBaseName = "Rei"
+    archiveVersion = ""
+    
+    manifest {
+        attributes(
+            "Main-Class" to "rei.Rei"
+        )
+    }
+    
+    // Include all runtime dependencies (though we don't have any in this project)
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    
+    // Prevent duplicates
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 // Configure source and test directories (they're already in standard locations)
 sourceSets {
     main {
