@@ -8,18 +8,38 @@ import rei.exceptions.ReiExceptions;
 
 import java.time.LocalDateTime;
 
+/**
+ * Command to create and add a new event task to the task list.
+ * An event task occurs during a specific time period with start and end times.
+ */
 public class EventCommand extends Command {
 
     private final String description;
     private final LocalDateTime start;
     private final LocalDateTime end;
 
+    /**
+     * Constructs a new EventCommand with the specified description, start time, and end time.
+     *
+     * @param description the description of the event
+     * @param start the start date and time of the event
+     * @param end the end date and time of the event
+     */
     public EventCommand(String description, LocalDateTime start, LocalDateTime end) {
         this.description = description;
         this.start = start;
         this.end = end;
     }
 
+    /**
+     * Executes the event command by creating a new event task and adding it to the task list.
+     * Also saves the updated task list to storage and displays confirmation to the user.
+     *
+     * @param tasks the TaskList to add the new event task to
+     * @param ui the Ui for displaying confirmation messages
+     * @param storage the Storage for persisting the updated task list
+     * @throws ReiExceptions if there's an error saving to storage
+     */
     @Override
     public void execute (TaskList tasks, Ui ui, Storage storage)
             throws ReiExceptions {

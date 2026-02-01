@@ -5,11 +5,22 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import rei.command.*;
 
+/**
+ * Parses user input strings and converts them into appropriate Command objects.
+ * Handles the interpretation of various command formats and their parameters.
+ */
 public class Parser {
 
     private static final DateTimeFormatter INPUT_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+    /**
+     * Parses the user input string and returns the corresponding Command object.
+     *
+     * @param input the user input string to parse
+     * @return the Command object representing the user's intended action
+     * @throws ReiExceptions if the input format is invalid or unrecognized
+     */
     public static Command parse(String input) throws ReiExceptions {
 
         if (input.equals("bye")) {
@@ -18,6 +29,14 @@ public class Parser {
 
         if (input.equals("list")) {
             return new ListCommand();
+        }
+
+        if (input.startsWith("find ")) {
+            String keyword = input.substring(5).trim();
+            if (keyword.isEmpty()) {
+                throw new ReiExceptions("Find command requires a keyword.");
+            }
+            return new FindCommand(keyword);
         }
 
         if (input.startsWith("todo")) {
@@ -75,6 +94,15 @@ public class Parser {
 
     }
 
+    /**
+     * Parses a task index from the user input string.
+     * Converts from 1-based user input to 0-based array index.
+     *
+     * @param input the full input string
+     * @param start the starting position to parse the index from
+     * @return the 0-based index for accessing the task list
+     * @throws ReiExceptions if the index is not a valid number
+     */
     private static int parseIndex(String input, int start) throws ReiExceptions {
         try {
             return Integer.parseInt(input.substring(start)) - 1;
@@ -84,6 +112,13 @@ public class Parser {
         }
     }
 
+    /**
+     * Parses a date string into a LocalDateTime object using the expected format.
+     *
+     * @param date the date string to parse in "yyyy-MM-dd HH:mm" format
+     * @return the parsed LocalDateTime object
+     * @throws ReiExceptions if the date string is not in the expected format
+     */
     private static LocalDateTime parseDate (String date) throws ReiExceptions {
         try {
             LocalDateTime dateTime = LocalDateTime.parse(date, INPUT_FORMAT);
