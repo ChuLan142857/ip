@@ -12,4 +12,5 @@ plugins {
 }
 
 rootProject.name = "ip"
-include("app")
+// Converted to single-project structure - no longer including app subproject
+// include("app")
