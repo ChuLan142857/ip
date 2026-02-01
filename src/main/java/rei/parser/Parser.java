@@ -20,6 +20,14 @@ public class Parser {
             return new ListCommand();
         }
 
+        if (input.startsWith("find ")) {
+            String keyword = input.substring(5).trim();
+            if (keyword.isEmpty()) {
+                throw new ReiExceptions("Find command requires a keyword.");
+            }
+            return new FindCommand(keyword);
+        }
+
         if (input.startsWith("todo")) {
             if (input.length() <= 5) {
                 throw new ReiExceptions("OOPS!!! The description of a todo cannot be empty.");
