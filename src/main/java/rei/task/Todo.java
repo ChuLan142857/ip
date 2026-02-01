@@ -21,7 +21,7 @@ public class Todo extends Task {
      * @return a formatted string with [T] prefix, status icon, and description
      */
     @Override
-    public String toString(){
+    public String toString() {
         return "[T]" + super.toString();
     }
 
@@ -31,7 +31,7 @@ public class Todo extends Task {
      * @return a formatted string with T prefix for saving to file
      */
     @Override
-    public String toFileString(){
+    public String toFileString() {
         return "T | " + super.toFileString();
     }
 }

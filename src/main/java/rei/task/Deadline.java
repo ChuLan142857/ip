@@ -16,7 +16,7 @@ public class Deadline extends Task {
      * @param description the description of the deadline task
      * @param ddl the deadline date and time when the task must be completed
      */
-    public Deadline(String description, LocalDateTime ddl){
+    public Deadline(String description, LocalDateTime ddl) {
         super(description);
         this.ddl = ddl;
     }
@@ -27,7 +27,7 @@ public class Deadline extends Task {
      * @return a formatted string with [D] prefix, status, description, and deadline
      */
     @Override
-    public String toString(){
+    public String toString() {
         return "[D]" + super.toString()
                 + " (by: " + formatDate(ddl) + ")";
     }
@@ -38,7 +38,7 @@ public class Deadline extends Task {
      * @return a formatted string with D prefix and deadline information for saving to file
      */
     @Override
-    public String toFileString(){
+    public String toFileString() {
         return "D | " + super.toFileString()
                 + " | " + ddl;
     }

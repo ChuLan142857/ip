@@ -23,8 +23,7 @@ public abstract class Task {
      * Marks this task as completed.
      */
     public void markDone() {
-        isDone = true
-        ;
+        isDone = true;
     }
 
     /**
@@ -76,7 +75,7 @@ public abstract class Task {
      * @return a formatted string containing the status icon and description
      */
     @Override
-    public String toString(){
+    public String toString() {
         return getStatusIcon() + " " + description;
     }
 
@@ -85,7 +84,7 @@ public abstract class Task {
      *
      * @return a formatted string suitable for saving to file
      */
-    public String toFileString(){
+    public String toFileString() {
         return getDoneFlag() + " | " + description;
     }
 }

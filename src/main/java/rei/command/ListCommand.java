@@ -10,7 +10,7 @@ import rei.exceptions.ReiExceptions;
  * Command to display all tasks in the task list.
  * Shows each task with its index number, type, status, and description.
  */
-public class ListCommand extends Command{
+public class ListCommand extends Command {
 
     /**
      * Executes the list command by displaying all tasks in the task list.
@@ -22,7 +22,7 @@ public class ListCommand extends Command{
      */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage)
-            throws ReiExceptions{
+            throws ReiExceptions {
 
         ui.showLine();
         ui.show("Here are the tasks in your list:");

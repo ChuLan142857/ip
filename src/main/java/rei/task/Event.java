@@ -18,7 +18,7 @@ public class Event extends Task {
      * @param start the start date and time of the event
      * @param end the end date and time of the event
      */
-    public Event(String description, LocalDateTime start, LocalDateTime end){
+    public Event(String description, LocalDateTime start, LocalDateTime end) {
         super(description);
         this.start = start;
         this.end = end;
@@ -30,7 +30,7 @@ public class Event extends Task {
      * @return a formatted string with [E] prefix, status, description, and time period
      */
     @Override
-    public String toString(){
+    public String toString() {
         return "[E]" + super.toString()
                 + " (from: " + format(start) + " to: " + format(end) + ")";
     }
@@ -41,7 +41,7 @@ public class Event extends Task {
      * @return a formatted string with E prefix and time information for saving to file
      */
     @Override
-    public String toFileString(){
+    public String toFileString() {
         return "E | " + super.toFileString()
                 + " | " + start + " | " + end;
     }
