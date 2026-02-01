@@ -7,13 +7,29 @@ import rei.task.*;
 import rei.list.TaskList;
 import rei.exceptions.ReiExceptions;
 
+/**
+ * Handles file operations for storing and loading tasks.
+ * Manages persistence of task data to and from the file system.
+ */
 public class Storage {
     private final String filePath;
 
+    /**
+     * Constructs a new Storage instance with the specified file path.
+     *
+     * @param filePath the path to the file used for storing tasks
+     */
     public Storage(String filePath) {
         this.filePath = filePath;
     }
 
+    /**
+     * Loads tasks from the storage file.
+     * Creates the file and parent directories if they don't exist.
+     *
+     * @return an ArrayList of tasks loaded from the file
+     * @throws ReiExceptions if there's an error reading from the file
+     */
     public ArrayList<Task> load() throws ReiExceptions {
         ArrayList<Task> tasks = new ArrayList<>();
         File file = new File(filePath);
@@ -46,6 +62,12 @@ public class Storage {
         }
     }
 
+    /**
+     * Saves the current task list to the storage file.
+     *
+     * @param tasks the TaskList containing all tasks to save
+     * @throws ReiExceptions if there's an error writing to the file
+     */
     public void save(TaskList tasks) throws ReiExceptions {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
@@ -60,6 +82,13 @@ public class Storage {
         }
     }
 
+    /**
+     * Parses a line from the storage file and creates the appropriate task object.
+     *
+     * @param line the line to parse from the file
+     * @return the Task object created from the line
+     * @throws ReiExceptions if the line format is invalid or corrupted
+     */
     private Task parseTask(String line) throws ReiExceptions {
         String[] parts = line.split(" \\| ");
 
@@ -75,6 +104,12 @@ public class Storage {
         }
     }
 
+    /**
+     * Creates a Todo task from parsed file data.
+     *
+     * @param parts the parsed components from the file line
+     * @return the constructed Todo task
+     */
     private Task loadTodo(String[] parts)
     {
         Task t = new Todo(parts[2]);
@@ -82,6 +117,12 @@ public class Storage {
         return t;
     }
 
+    /**
+     * Creates a Deadline task from parsed file data.
+     *
+     * @param parts the parsed components from the file line
+     * @return the constructed Deadline task
+     */
     private Task loadDeadline(String[] parts)
     {
         LocalDateTime by = LocalDateTime.parse(parts[3]);
@@ -90,6 +131,12 @@ public class Storage {
         return d;
     }
 
+    /**
+     * Creates an Event task from parsed file data.
+     *
+     * @param parts the parsed components from the file line
+     * @return the constructed Event task
+     */
     private Task loadEvent(String[] parts)
     {
         LocalDateTime from = LocalDateTime.parse(parts[3]);
@@ -99,6 +146,12 @@ public class Storage {
         return e;
     }
 
+    /**
+     * Sets the completion status of a task based on the done flag from file.
+     *
+     * @param task the task to update
+     * @param doneFlag "1" if task is done, "0" if not done
+     */
     private void setDone(Task task, String doneFlag)
     {
         if (doneFlag.equals("1")) {

@@ -4,8 +4,19 @@ import rei.list.TaskList;
 import rei.ui.Ui;
 import rei.storage.Storage;
 
+/**
+ * Command to exit the Rei application.
+ * Displays a farewell message and signals the application to terminate.
+ */
 public class ByeCommand extends Command {
 
+    /**
+     * Executes the bye command by displaying a farewell message.
+     *
+     * @param tasks the TaskList (not used in this command)
+     * @param ui the Ui for displaying the farewell message
+     * @param storage the Storage (not used in this command)
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showLine();
@@ -13,6 +24,11 @@ public class ByeCommand extends Command {
         ui.showLine();
     }
 
+    /**
+     * Indicates that this command should terminate the application.
+     *
+     * @return true to signal that the application should exit
+     */
     @Override
     public boolean isExit() {
         return true;

@@ -6,13 +6,31 @@ import rei.ui.Ui;
 import rei.storage.Storage;
 import rei.exceptions.ReiExceptions;
 
+/**
+ * Command to create and add a new todo task to the task list.
+ * A todo task is a simple task without any time constraints.
+ */
 public class TodoCommand extends Command {
     private final String description;
 
+    /**
+     * Constructs a new TodoCommand with the specified task description.
+     *
+     * @param description the description of the todo task to create
+     */
     public TodoCommand(String description) {
         this.description = description;
     }
 
+    /**
+     * Executes the todo command by creating a new todo task and adding it to the task list.
+     * Also saves the updated task list to storage and displays confirmation to the user.
+     *
+     * @param tasks the TaskList to add the new todo task to
+     * @param ui the Ui for displaying confirmation messages
+     * @param storage the Storage for persisting the updated task list
+     * @throws ReiExceptions if there's an error saving to storage
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage)
             throws ReiExceptions {

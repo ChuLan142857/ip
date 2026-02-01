@@ -6,8 +6,20 @@ import rei.ui.Ui;
 import rei.storage.Storage;
 import rei.exceptions.ReiExceptions;
 
+/**
+ * Command to display all tasks in the task list.
+ * Shows each task with its index number, type, status, and description.
+ */
 public class ListCommand extends Command{
 
+    /**
+     * Executes the list command by displaying all tasks in the task list.
+     *
+     * @param tasks the TaskList containing all tasks to display
+     * @param ui the Ui for displaying output to the user
+     * @param storage the Storage (not used in this command)
+     * @throws ReiExceptions if there's an error displaying the tasks
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage)
             throws ReiExceptions{
