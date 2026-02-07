@@ -2,7 +2,7 @@ package rei.command;
 
 import rei.task.*;
 import rei.list.TaskList;
-import rei.ui.Ui;
+import rei.ui.UiInterface;
 import rei.storage.Storage;
 import rei.exceptions.ReiExceptions;
 
@@ -21,7 +21,7 @@ public class ListCommand extends Command {
      * @throws ReiExceptions if there's an error displaying the tasks
      */
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage)
+    public void execute(TaskList tasks, UiInterface ui, Storage storage)
             throws ReiExceptions {
 
         ui.showLine();

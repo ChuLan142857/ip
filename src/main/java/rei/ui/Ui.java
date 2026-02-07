@@ -6,7 +6,7 @@ import java.util.Scanner;
  * Handles user interface operations for the Rei application.
  * Manages input reading and output display to the console.
  */
-public class Ui {
+public class Ui implements UiInterface {
     private static final String LINE = "____________________________________________________________";
     private final Scanner scanner = new Scanner(System.in);
 

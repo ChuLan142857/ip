@@ -1,7 +1,7 @@
 package rei.command;
 
 import rei.list.TaskList;
-import rei.ui.Ui;
+import rei.ui.UiInterface;
 import rei.storage.Storage;
 import rei.exceptions.ReiExceptions;
 
@@ -18,7 +18,7 @@ public abstract class Command {
      * @param storage the storage system for persisting tasks
      * @throws ReiExceptions if there's an error executing the command
      */
-    public abstract void execute(TaskList tasks, Ui ui, Storage storage)
+    public abstract void execute(TaskList tasks, UiInterface ui, Storage storage)
             throws ReiExceptions;
 
     /**

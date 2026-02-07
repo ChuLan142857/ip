@@ -1,7 +1,7 @@
 package rei.command;
 
 import rei.list.TaskList;
-import rei.ui.Ui;
+import rei.ui.UiInterface;
 import rei.storage.Storage;
 import rei.exceptions.ReiExceptions;
 import rei.task.Task;
@@ -33,7 +33,7 @@ public class FindCommand extends Command {
      * @param storage the Storage (not used in this command)
      */
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) {
+    public void execute(TaskList tasks, UiInterface ui, Storage storage) {
         ArrayList<Task> matches = new ArrayList<>();
 
         for (Task task : tasks.getAll()) {
