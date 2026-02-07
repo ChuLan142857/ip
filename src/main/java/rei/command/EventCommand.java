@@ -2,7 +2,7 @@ package rei.command;
 
 import rei.task.*;
 import rei.list.TaskList;
-import rei.ui.Ui;
+import rei.ui.UiInterface;
 import rei.storage.Storage;
 import rei.exceptions.ReiExceptions;
 
@@ -41,7 +41,7 @@ public class EventCommand extends Command {
      * @throws ReiExceptions if there's an error saving to storage
      */
     @Override
-    public void execute (TaskList tasks, Ui ui, Storage storage)
+    public void execute (TaskList tasks, UiInterface ui, Storage storage)
             throws ReiExceptions {
         tasks.add(new Event(description, start, end));
         storage.save(tasks);

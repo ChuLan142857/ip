@@ -1,6 +1,7 @@
 package rei;
 
 import rei.ui.Ui;
+import rei.ui.UiInterface;
 import rei.storage.Storage;
 import rei.list.TaskList;
 import rei.exceptions.ReiExceptions;
@@ -14,7 +15,7 @@ import rei.command.Command;
  */
 public class Rei {
 
-    private final Ui ui;
+    private final UiInterface ui;
     private final Storage storage;
     private final TaskList tasks;
 
@@ -51,6 +52,24 @@ public class Rei {
                 ui.showError(e.getMessage());
             }
         }
+    }
+
+    /**
+     * Gets the task list for GUI access.
+     *
+     * @return the task list
+     */
+    public TaskList getTaskList() {
+        return tasks;
+    }
+
+    /**
+     * Gets the storage for GUI access.
+     *
+     * @return the storage
+     */
+    public Storage getStorage() {
+        return storage;
     }
 
     /**

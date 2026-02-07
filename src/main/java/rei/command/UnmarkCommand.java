@@ -2,7 +2,7 @@ package rei.command;
 
 import rei.task.*;
 import rei.list.TaskList;
-import rei.ui.Ui;
+import rei.ui.UiInterface;
 import rei.storage.Storage;
 import rei.exceptions.ReiExceptions;
 
@@ -32,7 +32,7 @@ public class UnmarkCommand extends Command {
      * @throws ReiExceptions if the task index is invalid or there's an error saving to storage
      */
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage)
+    public void execute(TaskList tasks, UiInterface ui, Storage storage)
             throws ReiExceptions {
 
         tasks.markUndone(index);

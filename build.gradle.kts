@@ -1,6 +1,7 @@
 plugins {
     application
     java
+    id("org.openjfx.javafxplugin") version "0.0.14"
 }
 
 repositories {
@@ -8,6 +9,28 @@ repositories {
 }
 
 dependencies {
+    val javaFxVersion = "17.0.7"
+    
+    // JavaFX base dependencies (without classifier for compilation)
+    implementation("org.openjfx:javafx-base:$javaFxVersion")
+    implementation("org.openjfx:javafx-controls:$javaFxVersion")
+    implementation("org.openjfx:javafx-fxml:$javaFxVersion")
+    implementation("org.openjfx:javafx-graphics:$javaFxVersion")
+    
+    // Platform-specific runtime dependencies for cross-platform distribution
+    runtimeOnly("org.openjfx:javafx-base:$javaFxVersion:win")
+    runtimeOnly("org.openjfx:javafx-base:$javaFxVersion:mac")
+    runtimeOnly("org.openjfx:javafx-base:$javaFxVersion:linux")
+    runtimeOnly("org.openjfx:javafx-controls:$javaFxVersion:win")
+    runtimeOnly("org.openjfx:javafx-controls:$javaFxVersion:mac")
+    runtimeOnly("org.openjfx:javafx-controls:$javaFxVersion:linux")
+    runtimeOnly("org.openjfx:javafx-fxml:$javaFxVersion:win")
+    runtimeOnly("org.openjfx:javafx-fxml:$javaFxVersion:mac")
+    runtimeOnly("org.openjfx:javafx-fxml:$javaFxVersion:linux")
+    runtimeOnly("org.openjfx:javafx-graphics:$javaFxVersion:win")
+    runtimeOnly("org.openjfx:javafx-graphics:$javaFxVersion:mac")
+    runtimeOnly("org.openjfx:javafx-graphics:$javaFxVersion:linux")
+    
     // JUnit 5 dependencies with proper launcher
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.0")
@@ -24,6 +47,11 @@ tasks.test {
     }
 }
 
+// Handle duplicate resources
+tasks.processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -31,7 +59,12 @@ java {
 }
 
 application {
-    mainClass = "rei.Rei"
+    mainClass = "rei.Launcher"
+}
+
+javafx {
+    version = "17.0.7"
+    modules = listOf("javafx.controls", "javafx.fxml")
 }
 
 // Configure JAR to be executable
@@ -41,7 +74,7 @@ tasks.jar {
     
     manifest {
         attributes(
-            "Main-Class" to "rei.Rei"
+            "Main-Class" to "rei.Launcher"
         )
     }
     
