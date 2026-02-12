@@ -22,6 +22,13 @@ public class Parser {
      * @throws ReiExceptions if the input format is invalid or unrecognized
      */
     public static Command parse(String input) throws ReiExceptions {
+        assert input != null : "Input string cannot be null";
+        
+        String trimmedInput = input.trim();
+        assert !trimmedInput.isEmpty() : "Input string cannot be empty after trimming";
+        
+        // Use trimmed input for comparisons
+        input = trimmedInput;
 
         if (input.equals("bye")) {
             return new ByeCommand();
@@ -104,8 +111,17 @@ public class Parser {
      * @throws ReiExceptions if the index is not a valid number
      */
     private static int parseIndex(String input, int start) throws ReiExceptions {
+        assert input != null : "Input string cannot be null";
+        assert start >= 0 : "Start position cannot be negative";
+        assert start < input.length() : "Start position should be within input string bounds";
+        
         try {
-            return Integer.parseInt(input.substring(start)) - 1;
+            String indexStr = input.substring(start).trim();
+            assert !indexStr.isEmpty() : "Index substring should not be empty";
+            
+            int parsedIndex = Integer.parseInt(indexStr) - 1;
+            assert parsedIndex >= -1 : "Parsed index should be reasonable (user input >= 0)";
+            return parsedIndex;
         }
         catch (NumberFormatException e) {
             throw new ReiExceptions("OOPS!!! Task number must be a number.");
@@ -120,9 +136,13 @@ public class Parser {
      * @throws ReiExceptions if the date string is not in the expected format
      */
     private static LocalDateTime parseDate (String date) throws ReiExceptions {
+        assert date != null : "Date string cannot be null";
+        assert !date.trim().isEmpty() : "Date string cannot be empty";
+        
         try {
-            LocalDateTime dateTime = LocalDateTime.parse(date, INPUT_FORMAT);
-            return  dateTime;
+            LocalDateTime dateTime = LocalDateTime.parse(date.trim(), INPUT_FORMAT);
+            assert dateTime != null : "Parsed date should not be null";
+            return dateTime;
         } catch (Exception e) {
             throw new ReiExceptions("Please use yyyy-MM-dd HH:mm format!");
         }

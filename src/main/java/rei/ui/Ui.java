@@ -35,6 +35,7 @@ public class Ui implements UiInterface {
      * @param message the message to display
      */
     public void show(String message) {
+        assert message != null : "Message to display cannot be null";
         System.out.println(message);
     }
 

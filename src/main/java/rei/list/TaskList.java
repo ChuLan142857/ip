@@ -17,6 +17,7 @@ public class TaskList {
      * @param tasks the initial list of tasks
      */
     public TaskList(ArrayList<Task> tasks) {
+        assert tasks != null : "Tasks list cannot be null";
         this.tasks = tasks;
     }
 
@@ -26,6 +27,8 @@ public class TaskList {
      * @param task the task to add
      */
     public void add(Task task) {
+        assert task != null : "Cannot add null task to list";
+        assert tasks != null : "Task list should be initialized";
         tasks.add(task);
     }
 
@@ -81,6 +84,7 @@ public class TaskList {
      * @return the size of the task list
      */
     public int size() {
+        assert tasks != null : "Task list should be initialized";
         return tasks.size();
     }
 
@@ -90,6 +94,8 @@ public class TaskList {
      * @return the most recently added task
      */
     public Task getLast() {
+        assert tasks != null : "Task list should be initialized";
+        assert !tasks.isEmpty() : "Cannot get last task from empty list";
         return tasks.get(tasks.size() - 1);
     }
 
@@ -109,6 +115,8 @@ public class TaskList {
      * @throws ReiExceptions if the index is negative or exceeds the list size
      */
     private void checkIndex(int index) throws ReiExceptions {
+        assert tasks != null : "Task list should be initialized";
+        assert index >= -1 : "Index should not be extremely negative"; // Additional safety check
         if (index < 0 || index >= tasks.size()) {
             throw new ReiExceptions("OOPS!!! That task number is invalid.");
         }
