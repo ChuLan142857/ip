@@ -29,6 +29,11 @@ public class Rei {
         ui = new Ui();
         storage = new Storage("./data/Rei.txt");
         tasks = new TaskList(storage.load());
+        
+        // Assert all components are properly initialized
+        assert ui != null : "UI should be initialized";
+        assert storage != null : "Storage should be initialized";
+        assert tasks != null : "Task list should be initialized";
     }
 
     /**
@@ -37,12 +42,20 @@ public class Rei {
      * until the user issues an exit command.
      */
     public void run() {
+        assert ui != null : "UI must be initialized before running";
+        assert storage != null : "Storage must be initialized before running";
+        assert tasks != null : "Task list must be initialized before running";
+        
         ui.showWelcome();
 
         while (true) {
             try {
                 String input = ui.readCommand();
+                assert input != null : "UI should not return null input";
+                
                 Command command = Parser.parse(input);
+                assert command != null : "Parser should not return null command";
+                
                 command.execute(tasks, ui, storage);
 
                 if (command.isExit()) {

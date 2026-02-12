@@ -20,6 +20,8 @@ public class Storage {
      * @param filePath the path to the file used for storing tasks
      */
     public Storage(String filePath) {
+        assert filePath != null : "File path cannot be null";
+        assert !filePath.trim().isEmpty() : "File path cannot be empty";
         this.filePath = filePath;
     }
 
@@ -90,7 +92,11 @@ public class Storage {
      * @throws ReiExceptions if the line format is invalid or corrupted
      */
     private Task parseTask(String line) throws ReiExceptions {
+        assert line != null : "Line to parse cannot be null";
+        assert !line.trim().isEmpty() : "Line to parse cannot be empty";
+        
         String[] parts = line.split(" \\| ");
+        assert parts.length >= 3 : "Parsed line should have at least 3 parts (type, status, description)";
 
         switch (parts[0]) {
             case "T":
@@ -112,6 +118,12 @@ public class Storage {
      */
     private Task loadTodo(String[] parts)
     {
+        assert parts != null : "Parts array cannot be null";
+        assert parts.length >= 3 : "Todo requires at least 3 parts: type, status, description";
+        assert "T".equals(parts[0]) : "First part should be 'T' for Todo";
+        assert parts[1] != null : "Status part cannot be null";
+        assert parts[2] != null : "Description part cannot be null";
+        
         Task t = new Todo(parts[2]);
         setDone(t, parts[1]);
         return t;
@@ -125,6 +137,13 @@ public class Storage {
      */
     private Task loadDeadline(String[] parts)
     {
+        assert parts != null : "Parts array cannot be null";
+        assert parts.length >= 4 : "Deadline requires at least 4 parts: type, status, description, deadline";
+        assert "D".equals(parts[0]) : "First part should be 'D' for Deadline";
+        assert parts[1] != null : "Status part cannot be null";
+        assert parts[2] != null : "Description part cannot be null";
+        assert parts[3] != null : "Deadline part cannot be null";
+        
         LocalDateTime by = LocalDateTime.parse(parts[3]);
         Task d = new Deadline(parts[2], by);
         setDone(d, parts[1]);
@@ -139,8 +158,18 @@ public class Storage {
      */
     private Task loadEvent(String[] parts)
     {
+        assert parts != null : "Parts array cannot be null";
+        assert parts.length >= 5 : "Event requires at least 5 parts: type, status, description, start, end";
+        assert "E".equals(parts[0]) : "First part should be 'E' for Event";
+        assert parts[1] != null : "Status part cannot be null";
+        assert parts[2] != null : "Description part cannot be null";
+        assert parts[3] != null : "Start time part cannot be null";
+        assert parts[4] != null : "End time part cannot be null";
+        
         LocalDateTime from = LocalDateTime.parse(parts[3]);
         LocalDateTime to = LocalDateTime.parse(parts[4]);
+        assert !from.isAfter(to) : "Event start time should not be after end time";
+        
         Task e = new Event(parts[2], from, to);
         setDone(e, parts[1]);
         return e;
@@ -154,6 +183,10 @@ public class Storage {
      */
     private void setDone(Task task, String doneFlag)
     {
+        assert task != null : "Task cannot be null";
+        assert doneFlag != null : "Done flag cannot be null";
+        assert "0".equals(doneFlag) || "1".equals(doneFlag) : "Done flag must be '0' or '1'";
+        
         if (doneFlag.equals("1")) {
             task.markDone();
         }
