@@ -5,6 +5,7 @@ import rei.ui.UiInterface;
 import rei.storage.Storage;
 import rei.list.TaskList;
 import rei.exceptions.ReiExceptions;
+import rei.exceptions.ConfirmationRequiredException;
 import rei.parser.Parser;
 import rei.command.Command;
 
@@ -22,6 +23,9 @@ public class Rei {
     private final UiInterface ui;
     private final Storage storage;
     private final TaskList tasks;
+    
+    // State management for duplicate confirmation
+    private Command pendingCommand = null;
 
     /**
      * Constructs a new Rei application instance with default configuration.
@@ -162,11 +166,20 @@ public class Rei {
     private boolean processSingleCommand() {
         try {
             String userInput = getUserInput();
+            
+            // Check if we're waiting for confirmation
+            if (pendingCommand != null) {
+                return handleConfirmation(userInput);
+            }
+            
             Command command = parseCommand(userInput);
             executeCommand(command);
             
             return shouldContinueAfterCommand(command);
             
+        } catch (ConfirmationRequiredException e) {
+            handleConfirmationRequest(e);
+            return true; // Continue and wait for user confirmation
         } catch (ReiExceptions e) {
             handleCommandError(e);
             return true; // Continue after error
@@ -233,6 +246,57 @@ public class Rei {
      */
     private void handleCommandError(ReiExceptions error) {
         ui.showError(error.getMessage());
+    }
+    
+    /**
+     * Handles user confirmation when a pending command is waiting.
+     * 
+     * @param userInput the user's input (should be y/n)
+     * @return true if the application should continue
+     */
+    private boolean handleConfirmation(String userInput) {
+        String input = userInput.trim().toLowerCase();
+        
+        if (input.equals("y") || input.equals("yes")) {
+            try {
+                pendingCommand.execute(tasks, ui, storage);
+            } catch (ReiExceptions e) {
+                handleCommandError(e);
+            }
+        } else if (input.equals("n") || input.equals("no")) {
+            ui.showLine();
+            ui.show("Task not added.");
+            ui.showLine();
+        } else {
+            ui.showLine();
+            ui.show("Invalid confirmation. Please type 'y' or 'n'.");
+            ui.show("Task not added.");
+            ui.showLine();
+        }
+        
+        pendingCommand = null; // Clear pending state
+        return true;
+    }
+    
+    /**
+     * Handles a confirmation request from a command.
+     * 
+     * @param e the confirmation exception containing the message and pending command
+     */
+    private void handleConfirmationRequest(ConfirmationRequiredException e) {
+        ui.showLine();
+        ui.show(e.getMessage());
+        ui.showLine();
+        pendingCommand = e.getPendingCommand();
+    }
+    
+    /**
+     * Sets a command as pending, waiting for user confirmation.
+     * 
+     * @param command the command to set as pending
+     */
+    public void setPendingCommand(Command command) {
+        this.pendingCommand = command;
     }
 
     /**

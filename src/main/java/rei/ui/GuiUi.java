@@ -70,18 +70,4 @@ public class GuiUi implements UiInterface {
         show("Hello! I'm Rei.");
         show("What can I do for you?");
     }
-
-    /**
-     * In GUI mode, always returns true to confirm.
-     * GUI users don't have interactive confirmation.
-     *
-     * @param prompt the confirmation prompt (shown to user)
-     * @return true (always confirms in GUI mode)
-     */
-    public boolean readConfirmation(String prompt) {
-        show(prompt);
-        // In GUI mode, we auto-confirm since we can't wait for user input
-        show("(Auto-confirmed in GUI mode)");
-        return true;
-    }
 }

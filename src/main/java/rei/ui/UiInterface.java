@@ -36,12 +36,4 @@ public interface UiInterface {
      * @param message the error message to display
      */
     void showError(String message);
-
-    /**
-     * Reads a yes/no confirmation from the user.
-     *
-     * @param prompt the confirmation prompt to display
-     * @return true if the user confirms (y/yes), false otherwise (n/no)
-     */
-    boolean readConfirmation(String prompt);
 }

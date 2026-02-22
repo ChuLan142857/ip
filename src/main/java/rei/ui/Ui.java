@@ -56,17 +56,4 @@ public class Ui implements UiInterface {
         show(message);
         showLine();
     }
-
-    /**
-     * Reads a yes/no confirmation from the user.
-     *
-     * @param prompt the confirmation prompt to display
-     * @return true if the user confirms (y/yes), false otherwise
-     */
-    public boolean readConfirmation(String prompt) {
-        show(prompt);
-        String response = scanner.nextLine().trim().toLowerCase();
-        return response.equals("y") || response.equals("yes");
-    }
 }
-
