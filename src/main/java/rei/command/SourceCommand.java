@@ -4,6 +4,9 @@ import rei.list.TaskList;
 import rei.ui.UiInterface;
 import rei.storage.Storage;
 import rei.exceptions.ReiExceptions;
+import rei.exceptions.ConfirmationRequiredException;
+
+import java.io.File;
 
 /**
  * Command to switch the data source file or display the current data source.
@@ -34,12 +37,13 @@ public class SourceCommand extends Command {
 
     /**
      * Executes the source command. Either displays the current data source
-     * or shows the file path for switching (actual switch handled by Rei).
+     * or checks if the new file exists before switching.
      *
      * @param tasks the TaskList (will be ignored for queries)
      * @param ui the Ui for displaying messages
      * @param storage the Storage system
      * @throws ReiExceptions if there's an error accessing storage information
+     * @throws ConfirmationRequiredException if the new file doesn't exist
      */
     @Override
     public void execute(TaskList tasks, UiInterface ui, Storage storage)
@@ -50,7 +54,19 @@ public class SourceCommand extends Command {
             // Display current data source
             ui.show("Current data source: " + storage.getFilePath());
         } else {
-            // Just acknowledge the request - actual switching happens in Rei
+            // Check if file exists
+            File newFile = new File(newFilePath);
+            if (!newFile.exists()) {
+                // File doesn't exist - ask for confirmation to create
+                PendingSourceCommand pendingCommand = new PendingSourceCommand(newFilePath);
+                throw new ConfirmationRequiredException(
+                    "The file '" + newFilePath + "' doesn't exist.\n" +
+                    "Do you want to create a new data file at this location? (y/n)",
+                    pendingCommand
+                );
+            }
+            
+            // File exists - just acknowledge the request
             ui.show("Switching data source to: " + newFilePath);
             ui.show("Your current tasks will be saved before switching.");
         }

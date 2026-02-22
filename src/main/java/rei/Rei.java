@@ -9,6 +9,7 @@ import rei.exceptions.ConfirmationRequiredException;
 import rei.parser.Parser;
 import rei.command.Command;
 import rei.command.SourceCommand;
+import rei.command.PendingSourceCommand;
 
 /**
  * The main class for the Rei task management application.
@@ -266,17 +267,33 @@ public class Rei {
         if (input.equals("y") || input.equals("yes")) {
             try {
                 pendingCommand.execute(tasks, ui, storage);
+                
+                // If this was a PendingSourceCommand, perform the actual switch
+                if (pendingCommand instanceof PendingSourceCommand) {
+                    PendingSourceCommand sourceCmd = (PendingSourceCommand) pendingCommand;
+                    switchDataSource(sourceCmd.getNewFilePath());
+                    ui.showLine();
+                    ui.show("Successfully switched to new data source!");
+                    ui.show("Loaded " + tasks.size() + " tasks from " + sourceCmd.getNewFilePath());
+                    ui.showLine();
+                }
             } catch (ReiExceptions e) {
                 handleCommandError(e);
             }
         } else if (input.equals("n") || input.equals("no")) {
             ui.showLine();
-            ui.show("Task not added.");
+            String cancelMessage = (pendingCommand instanceof PendingSourceCommand) 
+                ? "Data source not created." 
+                : "Task not added.";
+            ui.show(cancelMessage);
             ui.showLine();
         } else {
             ui.showLine();
             ui.show("Invalid confirmation. Please type 'y' or 'n'.");
-            ui.show("Task not added.");
+            String cancelMessage = (pendingCommand instanceof PendingSourceCommand) 
+                ? "Data source not created." 
+                : "Task not added.";
+            ui.show(cancelMessage);
             ui.showLine();
         }
         

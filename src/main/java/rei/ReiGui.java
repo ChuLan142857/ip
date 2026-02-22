@@ -17,6 +17,7 @@ import rei.exceptions.ReiExceptions;
 import rei.exceptions.ConfirmationRequiredException;
 import rei.parser.Parser;
 import rei.command.Command;
+import rei.command.PendingSourceCommand;
 
 /**
  * A GUI for the Rei chatbot using JavaFX.
@@ -308,13 +309,27 @@ public class ReiGui extends Application {
             try {
                 String response = executeCommand(pendingCommand);
                 displayBotResponse(response);
+                
+                // If this was a PendingSourceCommand, perform the actual switch
+                if (pendingCommand instanceof PendingSourceCommand) {
+                    PendingSourceCommand sourceCmd = (PendingSourceCommand) pendingCommand;
+                    rei.switchDataSource(sourceCmd.getNewFilePath());
+                    displayBotResponse("Successfully switched to new data source!\n" +
+                        "Loaded " + rei.getTaskList().size() + " tasks from " + sourceCmd.getNewFilePath());
+                }
             } catch (ReiExceptions e) {
                 displayErrorResponse(e.getMessage());
             }
         } else if (trimmedInput.equals("n") || trimmedInput.equals("no")) {
-            displayBotResponse("Task not added.");
+            String cancelMessage = (pendingCommand instanceof PendingSourceCommand) 
+                ? "Data source not created." 
+                : "Task not added.";
+            displayBotResponse(cancelMessage);
         } else {
-            displayBotResponse("Invalid confirmation. Please type 'y' or 'n'.\nTask not added.");
+            String cancelMessage = (pendingCommand instanceof PendingSourceCommand) 
+                ? "Data source not created." 
+                : "Task not added.";
+            displayBotResponse("Invalid confirmation. Please type 'y' or 'n'.\n" + cancelMessage);
         }
         
         pendingCommand = null; // Clear pending state
