@@ -8,6 +8,7 @@ import rei.exceptions.ReiExceptions;
 import rei.exceptions.ConfirmationRequiredException;
 import rei.parser.Parser;
 import rei.command.Command;
+import rei.command.SourceCommand;
 
 /**
  * The main class for the Rei task management application.
@@ -21,8 +22,8 @@ public class Rei {
     
     // Core application components
     private final UiInterface ui;
-    private final Storage storage;
-    private final TaskList tasks;
+    private Storage storage;
+    private TaskList tasks;
     
     // State management for duplicate confirmation
     private Command pendingCommand = null;
@@ -175,6 +176,11 @@ public class Rei {
             Command command = parseCommand(userInput);
             executeCommand(command);
             
+            // Handle data source switching if this is a SourceCommand
+            if (command instanceof SourceCommand) {
+                handleSourceCommand((SourceCommand) command);
+            }
+            
             return shouldContinueAfterCommand(command);
             
         } catch (ConfirmationRequiredException e) {
@@ -291,6 +297,23 @@ public class Rei {
     }
     
     /**
+     * Handles a source command by switching data sources if requested.
+     * 
+     * @param sourceCommand the source command to handle
+     * @throws ReiExceptions if there's an error switching data sources
+     */
+    private void handleSourceCommand(SourceCommand sourceCommand) throws ReiExceptions {
+        if (!sourceCommand.isQuery()) {
+            String newFilePath = sourceCommand.getNewFilePath();
+            switchDataSource(newFilePath);
+            ui.showLine();
+            ui.show("Successfully switched to new data source!");
+            ui.show("Loaded " + tasks.size() + " tasks from " + newFilePath);
+            ui.showLine();
+        }
+    }
+    
+    /**
      * Sets a command as pending, waiting for user confirmation.
      * 
      * @param command the command to set as pending
@@ -317,6 +340,26 @@ public class Rei {
      */
     public Storage getStorage() {
         return storage;
+    }
+
+    /**
+     * Switches to a new data source file and reloads tasks from it.
+     * Saves current tasks to the existing storage before switching.
+     *
+     * @param newFilePath the path to the new data file
+     * @throws ReiExceptions if there's an error switching or loading from the new source
+     */
+    public void switchDataSource(String newFilePath) throws ReiExceptions {
+        // Save current tasks before switching
+        if (tasks != null && storage != null) {
+            storage.save(tasks);
+        }
+        
+        // Initialize new storage
+        storage = initializeStorage(newFilePath);
+        
+        // Reload tasks from new storage
+        tasks = initializeTaskList();
     }
 
     /**

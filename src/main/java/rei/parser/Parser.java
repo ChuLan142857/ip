@@ -30,6 +30,7 @@ public class Parser {
     // Command keywords
     private static final String BYE_COMMAND = "bye";
     private static final String LIST_COMMAND = "list";
+    private static final String SOURCE_COMMAND = "source";
     private static final String FIND_COMMAND_PREFIX = "find ";
     private static final String TODO_COMMAND_PREFIX = "todo";
     private static final String DEADLINE_COMMAND_PREFIX = "deadline";
@@ -37,6 +38,7 @@ public class Parser {
     private static final String MARK_COMMAND_PREFIX = "mark ";
     private static final String UNMARK_COMMAND_PREFIX = "unmark ";
     private static final String DELETE_COMMAND_PREFIX = "delete ";
+    private static final String SOURCE_COMMAND_PREFIX = "source ";
 
     /**
      * Parses the user input string and returns the corresponding Command object.
@@ -100,6 +102,10 @@ public class Parser {
             return new ListCommand();
         }
         
+        if (input.equals(SOURCE_COMMAND)) {
+            return new SourceCommand(); // Query current source
+        }
+        
         return null; // No simple command matches
     }
     
@@ -113,6 +119,10 @@ public class Parser {
     private static Command tryParseParameterizedCommands(String input) throws ReiExceptions {
         if (input.startsWith(FIND_COMMAND_PREFIX)) {
             return parseFindCommand(input);
+        }
+        
+        if (input.startsWith(SOURCE_COMMAND_PREFIX)) {
+            return parseSourceCommand(input);
         }
         
         if (input.startsWith(TODO_COMMAND_PREFIX)) {
@@ -157,6 +167,23 @@ public class Parser {
         }
         
         return new FindCommand(keyword);
+    }
+    
+    /**
+     * Parses source command from input string.
+     * 
+     * @param input the input string starting with "source "
+     * @return SourceCommand object with the new file path
+     * @throws ReiExceptions if file path is empty
+     */
+    private static Command parseSourceCommand(String input) throws ReiExceptions {
+        String filePath = input.substring(SOURCE_COMMAND_PREFIX.length()).trim();
+        
+        if (filePath.isEmpty()) {
+            throw new ReiExceptions("OOPS!!! The file path cannot be empty.");
+        }
+        
+        return new SourceCommand(filePath);
     }
     
     /**

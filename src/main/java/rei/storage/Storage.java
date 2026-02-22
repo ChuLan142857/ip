@@ -412,5 +412,14 @@ public class Storage {
             throw new ReiExceptions("OOPS!!! Invalid completion status in data file: " + doneFlag);
         }
     }
+
+    /**
+     * Gets the file path of the current data source.
+     *
+     * @return the file path being used for storage
+     */
+    public String getFilePath() {
+        return filePath;
+    }
 }
 
