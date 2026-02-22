@@ -398,23 +398,35 @@ public class Parser {
     }
 
     /**
-     * Parses a date string into a LocalDateTime object using the expected format.
+     * Parses a date string into a LocalDateTime object.
+     * Supports both natural language dates (e.g., "Mon", "today", "tomorrow")
+     * and the standard "yyyy-MM-dd HH:mm" format.
      * Provides clear error messages and proper validation.
      *
-     * @param dateString the date string to parse in "yyyy-MM-dd HH:mm" format
+     * @param dateString the date string to parse
      * @return the parsed LocalDateTime object
-     * @throws ReiExceptions if the date string is not in the expected format or is invalid
+     * @throws ReiExceptions if the date string is not in a recognized format or is invalid
      */
     private static LocalDateTime parseDate(String dateString) throws ReiExceptions {
         validateDateInput(dateString);
         
         String cleanedDateString = dateString.trim();
         
+        // Try natural date parsing first
+        if (NaturalDateParser.isNaturalDate(cleanedDateString)) {
+            try {
+                return NaturalDateParser.parse(cleanedDateString);
+            } catch (Exception e) {
+                throw new ReiExceptions("Invalid natural date format: " + e.getMessage());
+            }
+        }
+        
+        // Fall back to standard format parsing
         try {
             LocalDateTime parsedDateTime = LocalDateTime.parse(cleanedDateString, INPUT_FORMAT);
             return parsedDateTime;
         } catch (Exception e) {
-            throw new ReiExceptions("Please use yyyy-MM-dd HH:mm format!");
+            throw new ReiExceptions("Please use yyyy-MM-dd HH:mm format or natural dates like 'Mon', 'today', 'tomorrow'!");
         }
     }
     
