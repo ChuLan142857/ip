@@ -18,6 +18,7 @@ import rei.exceptions.ConfirmationRequiredException;
 import rei.parser.Parser;
 import rei.command.Command;
 import rei.command.PendingSourceCommand;
+import rei.command.SourceCommand;
 
 /**
  * A GUI for the Rei chatbot using JavaFX.
@@ -288,6 +289,11 @@ public class ReiGui extends Application {
             String response = executeCommand(command);
             displayBotResponse(response);
             
+            // Handle data source switching if this is a SourceCommand
+            if (command instanceof SourceCommand) {
+                handleSourceCommand((SourceCommand) command);
+            }
+            
             handlePotentialExit(command);
             
         } catch (ConfirmationRequiredException e) {
@@ -343,6 +349,25 @@ public class ReiGui extends Application {
     private void handleConfirmationRequest(ConfirmationRequiredException e) {
         displayBotResponse(e.getMessage());
         pendingCommand = e.getPendingCommand();
+    }
+    
+    /**
+     * Handles a source command by switching data sources if requested.
+     * 
+     * @param sourceCommand the source command to handle
+     * @throws ReiExceptions if there's an error switching data sources
+     */
+    private void handleSourceCommand(SourceCommand sourceCommand) throws ReiExceptions {
+        if (!sourceCommand.isQuery()) {
+            String newFilePath = sourceCommand.getNewFilePath();
+            try {
+                rei.switchDataSource(newFilePath);
+                displayBotResponse("Successfully switched to new data source!\n" +
+                    "Loaded " + rei.getTaskList().size() + " tasks from " + newFilePath);
+            } catch (ReiExceptions e) {
+                throw new ReiExceptions("Failed to switch data source: " + e.getMessage());
+            }
+        }
     }
     
     /**

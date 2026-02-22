@@ -322,11 +322,15 @@ public class Rei {
     private void handleSourceCommand(SourceCommand sourceCommand) throws ReiExceptions {
         if (!sourceCommand.isQuery()) {
             String newFilePath = sourceCommand.getNewFilePath();
-            switchDataSource(newFilePath);
-            ui.showLine();
-            ui.show("Successfully switched to new data source!");
-            ui.show("Loaded " + tasks.size() + " tasks from " + newFilePath);
-            ui.showLine();
+            try {
+                switchDataSource(newFilePath);
+                ui.showLine();
+                ui.show("Successfully switched to new data source!");
+                ui.show("Loaded " + tasks.size() + " tasks from " + newFilePath);
+                ui.showLine();
+            } catch (ReiExceptions e) {
+                throw new ReiExceptions("Failed to switch data source: " + e.getMessage());
+            }
         }
     }
     
@@ -367,16 +371,33 @@ public class Rei {
      * @throws ReiExceptions if there's an error switching or loading from the new source
      */
     public void switchDataSource(String newFilePath) throws ReiExceptions {
+        // Validate new file path
+        if (newFilePath == null || newFilePath.trim().isEmpty()) {
+            throw new ReiExceptions("New file path cannot be null or empty");
+        }
+        
         // Save current tasks before switching
         if (tasks != null && storage != null) {
-            storage.save(tasks);
+            try {
+                storage.save(tasks);
+            } catch (ReiExceptions e) {
+                throw new ReiExceptions("Failed to save current tasks: " + e.getMessage());
+            }
         }
         
         // Initialize new storage
-        storage = initializeStorage(newFilePath);
+        try {
+            storage = initializeStorage(newFilePath);
+        } catch (Exception e) {
+            throw new ReiExceptions("Failed to initialize new storage: " + e.getMessage());
+        }
         
         // Reload tasks from new storage
-        tasks = initializeTaskList();
+        try {
+            tasks = initializeTaskList();
+        } catch (Exception e) {
+            throw new ReiExceptions("Failed to load tasks from new source: " + e.getMessage());
+        }
     }
 
     /**
