@@ -314,7 +314,7 @@ public class ReiGui extends Application {
         } else if (trimmedInput.equals("n") || trimmedInput.equals("no")) {
             displayBotResponse("Task not added.");
         } else {
-            displayBotResponse("Invalid confirmation. Please type 'y' or 'n'.\\nTask not added.");
+            displayBotResponse("Invalid confirmation. Please type 'y' or 'n'.\nTask not added.");
         }
         
         pendingCommand = null; // Clear pending state
