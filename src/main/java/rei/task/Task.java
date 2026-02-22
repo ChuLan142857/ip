@@ -90,4 +90,23 @@ public abstract class Task {
     public String toFileString() {
         return getDoneFlag() + " | " + description;
     }
+
+    /**
+     * Checks if this task is equal to another object.
+     * Two tasks are considered equal if they have the same description and type.
+     * The done status is not considered in equality comparison.
+     *
+     * @param obj the object to compare with
+     * @return true if the tasks are equal, false otherwise
+     */
+    @Override
+    public abstract boolean equals(Object obj);
+
+    /**
+     * Returns a hash code value for this task.
+     *
+     * @return a hash code value based on the task's description
+     */
+    @Override
+    public abstract int hashCode();
 }

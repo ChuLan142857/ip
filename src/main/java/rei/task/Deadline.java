@@ -54,4 +54,34 @@ public class Deadline extends Task {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy HH:mm");
         return dateTime.format(formatter);
     }
+
+    /**
+     * Checks if this deadline is equal to another object.
+     * Two deadlines are equal if they have the same description and deadline.
+     *
+     * @param obj the object to compare with
+     * @return true if the deadlines are equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Deadline)) {
+            return false;
+        }
+        Deadline other = (Deadline) obj;
+        return this.getDescription().equals(other.getDescription())
+                && this.ddl.equals(other.ddl);
+    }
+
+    /**
+     * Returns a hash code for this deadline based on its description and deadline.
+     *
+     * @return a hash code value
+     */
+    @Override
+    public int hashCode() {
+        return getDescription().hashCode() * 31 + ddl.hashCode();
+    }
 }

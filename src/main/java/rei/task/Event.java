@@ -60,4 +60,38 @@ public class Event extends Task {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy HH:mm");
         return dt.format(formatter);
     }
+
+    /**
+     * Checks if this event is equal to another object.
+     * Two events are equal if they have the same description, start time, and end time.
+     *
+     * @param obj the object to compare with
+     * @return true if the events are equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Event)) {
+            return false;
+        }
+        Event other = (Event) obj;
+        return this.getDescription().equals(other.getDescription())
+                && this.start.equals(other.start)
+                && this.end.equals(other.end);
+    }
+
+    /**
+     * Returns a hash code for this event based on its description, start, and end times.
+     *
+     * @return a hash code value
+     */
+    @Override
+    public int hashCode() {
+        int result = getDescription().hashCode();
+        result = 31 * result + start.hashCode();
+        result = 31 * result + end.hashCode();
+        return result;
+    }
 }

@@ -24,6 +24,7 @@ public class TodoCommand extends Command {
 
     /**
      * Executes the todo command by creating a new todo task and adding it to the task list.
+     * Checks for duplicates before adding. If a duplicate exists, warns the user but still adds it.
      * Also saves the updated task list to storage and displays confirmation to the user.
      *
      * @param tasks the TaskList to add the new todo task to
@@ -34,8 +35,15 @@ public class TodoCommand extends Command {
     @Override
     public void execute(TaskList tasks, UiInterface ui, Storage storage)
             throws ReiExceptions {
+        Todo newTask = new Todo(description);
+        
+        if (tasks.hasDuplicate(newTask)) {
+            ui.showLine();
+            ui.show("WARNING: This task already exists in your list!");
+            ui.show("Adding it anyway...");
+        }
 
-        tasks.add(new Todo(description));
+        tasks.add(newTask);
         storage.save(tasks);
 
         ui.showLine();

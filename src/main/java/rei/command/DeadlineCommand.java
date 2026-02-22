@@ -29,6 +29,7 @@ public class DeadlineCommand extends Command {
 
     /**
      * Executes the deadline command by creating a new deadline task and adding it to the task list.
+     * Checks for duplicates before adding. If a duplicate exists, warns the user but still adds it.
      * Also saves the updated task list to storage and displays confirmation to the user.
      *
      * @param tasks the TaskList to add the new deadline task to
@@ -39,7 +40,15 @@ public class DeadlineCommand extends Command {
     @Override
     public void execute (TaskList tasks, UiInterface ui, Storage storage)
             throws ReiExceptions {
-        tasks.add(new Deadline(description, ddl));
+        Deadline newTask = new Deadline(description, ddl);
+        
+        if (tasks.hasDuplicate(newTask)) {
+            ui.showLine();
+            ui.show("WARNING: This task already exists in your list!");
+            ui.show("Adding it anyway...");
+        }
+
+        tasks.add(newTask);
         storage.save(tasks);
 
         ui.showLine();
