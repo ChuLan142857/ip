@@ -1,7 +1,9 @@
 package rei.parser;
 
 import rei.exceptions.ReiExceptions;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import rei.command.*;
 
@@ -11,8 +13,11 @@ import rei.command.*;
  */
 public class Parser {
 
-    private static final DateTimeFormatter INPUT_FORMAT =
+    private static final DateTimeFormatter INPUT_FORMAT_WITH_TIME =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private static final DateTimeFormatter INPUT_FORMAT_DATE_ONLY =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final LocalTime DEFAULT_TIME = LocalTime.of(23, 59);
     
     // Constants for string parsing offsets to avoid magic numbers
     private static final int FIND_COMMAND_PREFIX_LENGTH = 5;
@@ -399,8 +404,9 @@ public class Parser {
 
     /**
      * Parses a date string into a LocalDateTime object.
-     * Supports both natural language dates (e.g., "Mon", "today", "tomorrow")
-     * and the standard "yyyy-MM-dd HH:mm" format.
+     * Supports natural language dates (e.g., "Mon", "today", "tomorrow"),
+     * standard format with time ("yyyy-MM-dd HH:mm"),
+     * and date-only format ("yyyy-MM-dd") which defaults to 23:59.
      * Provides clear error messages and proper validation.
      *
      * @param dateString the date string to parse
@@ -421,12 +427,18 @@ public class Parser {
             }
         }
         
-        // Fall back to standard format parsing
+        // Try standard format with time (yyyy-MM-dd HH:mm)
         try {
-            LocalDateTime parsedDateTime = LocalDateTime.parse(cleanedDateString, INPUT_FORMAT);
+            LocalDateTime parsedDateTime = LocalDateTime.parse(cleanedDateString, INPUT_FORMAT_WITH_TIME);
             return parsedDateTime;
         } catch (Exception e) {
-            throw new ReiExceptions("Please use yyyy-MM-dd HH:mm format or natural dates like 'Mon', 'today', 'tomorrow'!");
+            // If that fails, try date-only format (yyyy-MM-dd)
+            try {
+                LocalDate date = LocalDate.parse(cleanedDateString, INPUT_FORMAT_DATE_ONLY);
+                return LocalDateTime.of(date, DEFAULT_TIME);
+            } catch (Exception e2) {
+                throw new ReiExceptions("Please use yyyy-MM-dd or yyyy-MM-dd HH:mm format, or natural dates like 'Mon', 'today', 'tomorrow'!");
+            }
         }
     }
     
