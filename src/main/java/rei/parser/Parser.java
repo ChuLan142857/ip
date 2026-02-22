@@ -169,9 +169,12 @@ public class Parser {
     
     /**
      * Parses find command from input string.
+     * Supports both AND and OR search modes.
+     * Format: "find [AND|OR] keyword..."
+     * If no mode specified, defaults to OR.
      * 
      * @param input the input string starting with "find "
-     * @return FindCommand object
+     * @return FindCommand object with appropriate search mode
      * @throws ReiExceptions if keyword is missing
      */
     private static Command parseFindCommand(String input) throws ReiExceptions {
@@ -181,7 +184,24 @@ public class Parser {
             throw new ReiExceptions("Find command requires a keyword.");
         }
         
-        return new FindCommand(keyword);
+        // Check for AND/OR prefix
+        String upperKeyword = keyword.trim().toUpperCase();
+        boolean useAndLogic = false;
+        String actualKeyword = keyword;
+        
+        if (upperKeyword.startsWith("AND ")) {
+            useAndLogic = true;
+            actualKeyword = keyword.substring(4).trim();
+        } else if (upperKeyword.startsWith("OR ")) {
+            useAndLogic = false;
+            actualKeyword = keyword.substring(3).trim();
+        }
+        
+        if (actualKeyword.isEmpty()) {
+            throw new ReiExceptions("Find command requires at least one keyword after AND/OR.");
+        }
+        
+        return new FindCommand(actualKeyword, useAndLogic);
     }
     
     /**
