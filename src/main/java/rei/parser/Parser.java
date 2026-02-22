@@ -32,6 +32,7 @@ public class Parser {
     private static final String LIST_COMMAND = "list";
     private static final String SOURCE_COMMAND = "source";
     private static final String SORT_COMMAND = "sort";
+    private static final String SORT_COMMAND_PREFIX = "sort ";
     private static final String FIND_COMMAND_PREFIX = "find ";
     private static final String TODO_COMMAND_PREFIX = "todo";
     private static final String DEADLINE_COMMAND_PREFIX = "deadline";
@@ -130,6 +131,10 @@ public class Parser {
             return parseSourceCommand(input);
         }
         
+        if (input.startsWith(SORT_COMMAND_PREFIX)) {
+            return parseSortCommand(input);
+        }
+        
         if (input.startsWith(TODO_COMMAND_PREFIX)) {
             return parseTodoCommand(input);
         }
@@ -189,6 +194,29 @@ public class Parser {
         }
         
         return new SourceCommand(filePath);
+    }
+    
+    /**
+     * Parses sort command from input string.
+     * 
+     * @param input the input string starting with "sort "
+     * @return SortCommand object with the specified sort type
+     * @throws ReiExceptions if sort type is invalid
+     */
+    private static Command parseSortCommand(String input) throws ReiExceptions {
+        String sortType = input.substring(SORT_COMMAND_PREFIX.length()).trim().toLowerCase();
+        
+        if (sortType.isEmpty()) {
+            throw new ReiExceptions("OOPS!!! Please specify sort type: 'insertion' or 'date'.");
+        }
+        
+        if (sortType.equals("insertion") || sortType.equals("original")) {
+            return new SortCommand(true);
+        } else if (sortType.equals("date") || sortType.equals("chronological")) {
+            return new SortCommand(false);
+        } else {
+            throw new ReiExceptions("OOPS!!! Invalid sort type. Use 'insertion', 'original', 'date', or 'chronological'.");
+        }
     }
     
     /**

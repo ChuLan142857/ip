@@ -14,14 +14,31 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 /**
- * Command to sort tasks chronologically.
- * Sorts deadlines by their deadline date, events by their start date,
- * and places todos at the end (sorted alphabetically).
+ * Command to sort tasks either chronologically or by insertion order.
+ * Chronological: Sorts deadlines by deadline date, events by start date, todos alphabetically at end.
+ * Insertion: Sorts tasks back to their original addition order.
  */
 public class SortCommand extends Command {
+    private final boolean sortByInsertion;
 
     /**
-     * Executes the sort command to reorder tasks chronologically.
+     * Constructs a new SortCommand that sorts chronologically by default.
+     */
+    public SortCommand() {
+        this.sortByInsertion = false;
+    }
+
+    /**
+     * Constructs a new SortCommand with specified sort type.
+     *
+     * @param sortByInsertion true to sort by insertion order, false for chronological
+     */
+    public SortCommand(boolean sortByInsertion) {
+        this.sortByInsertion = sortByInsertion;
+    }
+
+    /**
+     * Executes the sort command to reorder tasks.
      *
      * @param tasks the TaskList to sort
      * @param ui the Ui for displaying messages
@@ -41,15 +58,34 @@ public class SortCommand extends Command {
         
         // Get all tasks and sort them
         ArrayList<Task> taskList = tasks.getAll();
-        taskList.sort(new TaskDateComparator());
+        if (sortByInsertion) {
+            taskList.sort(new TaskInsertionComparator());
+        } else {
+            taskList.sort(new TaskDateComparator());
+        }
         
         // Save the sorted list
         storage.save(tasks);
         
         ui.showLine();
-        ui.show("Tasks sorted chronologically!");
-        ui.show("Deadlines and events are sorted by date, todos are at the end.");
+        if (sortByInsertion) {
+            ui.show("Tasks sorted by insertion order!");
+            ui.show("Tasks are now in the order they were added.");
+        } else {
+            ui.show("Tasks sorted chronologically!");
+            ui.show("Deadlines and events are sorted by date, todos are at the end.");
+        }
         ui.showLine();
+    }
+    
+    /**
+     * Comparator for sorting tasks by their insertion order.
+     */
+    private static class TaskInsertionComparator implements Comparator<Task> {
+        @Override
+        public int compare(Task t1, Task t2) {
+            return Long.compare(t1.getInsertionOrder(), t2.getInsertionOrder());
+        }
     }
     
     /**

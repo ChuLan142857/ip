@@ -5,12 +5,16 @@ package rei.task;
  * All specific task types (Todo, Deadline, Event) extend this class.
  */
 public abstract class Task {
+    private static long nextInsertionOrder = 0;
+    
     private String description;
     private boolean isDone;
+    private final long insertionOrder;
 
     /**
      * Constructs a new task with the given description.
      * The task is initially marked as not done.
+     * Assigns an insertion order for tracking original add sequence.
      *
      * @param description the description of the task
      */
@@ -19,6 +23,7 @@ public abstract class Task {
         assert !description.trim().isEmpty() : "Task description cannot be empty";
         this.description = description;
         this.isDone = false;
+        this.insertionOrder = nextInsertionOrder++;
     }
 
     /**
@@ -70,6 +75,16 @@ public abstract class Task {
     public String getDescription() {
         assert description != null : "Task description should never be null";
         return description;
+    }
+
+    /**
+     * Gets the insertion order of this task.
+     * Used for sorting tasks back to their original order.
+     *
+     * @return the insertion order number
+     */
+    public long getInsertionOrder() {
+        return insertionOrder;
     }
 
     /**
