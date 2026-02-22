@@ -25,18 +25,19 @@ public class Storage {
     private static final String EVENT_TYPE_IDENTIFIER = "E";
     
     // Constants for minimum required parts for each task type
-    private static final int MINIMUM_TASK_PARTS = 3;
-    private static final int MINIMUM_TODO_PARTS = 3;
-    private static final int MINIMUM_DEADLINE_PARTS = 4;
-    private static final int MINIMUM_EVENT_PARTS = 5;
+    private static final int MINIMUM_TASK_PARTS = 4;
+    private static final int MINIMUM_TODO_PARTS = 4;
+    private static final int MINIMUM_DEADLINE_PARTS = 5;
+    private static final int MINIMUM_EVENT_PARTS = 6;
     
     // Array indices for task parts
     private static final int TYPE_INDEX = 0;
     private static final int STATUS_INDEX = 1;
-    private static final int DESCRIPTION_INDEX = 2;
-    private static final int DEADLINE_DATE_INDEX = 3;
-    private static final int EVENT_START_INDEX = 3;
-    private static final int EVENT_END_INDEX = 4;
+    private static final int PRIORITY_INDEX = 2;
+    private static final int DESCRIPTION_INDEX = 3;
+    private static final int DEADLINE_DATE_INDEX = 4;
+    private static final int EVENT_START_INDEX = 4;
+    private static final int EVENT_END_INDEX = 5;
 
     /**
      * Constructs a new Storage instance with the specified file path.
@@ -252,13 +253,15 @@ public class Storage {
         
         String description = parts[DESCRIPTION_INDEX];
         String statusFlag = parts[STATUS_INDEX];
+        String priorityString = parts[PRIORITY_INDEX];
         
         Task todoTask = new Todo(description);
         setTaskCompletionStatus(todoTask, statusFlag);
+        setTaskPriority(todoTask, priorityString);
         
-        // Load tags if present (index 3 for Todo)
-        if (parts.length > 3 && !parts[3].trim().isEmpty()) {
-            loadTagsIntoTask(todoTask, parts[3]);
+        // Load tags if present (index 4 for Todo)
+        if (parts.length > 4 && !parts[4].trim().isEmpty()) {
+            loadTagsIntoTask(todoTask, parts[4]);
         }
         
         return todoTask;
@@ -294,15 +297,17 @@ public class Storage {
         String description = parts[DESCRIPTION_INDEX];
         String deadlineDateString = parts[DEADLINE_DATE_INDEX];
         String statusFlag = parts[STATUS_INDEX];
+        String priorityString = parts[PRIORITY_INDEX];
         
         try {
             LocalDateTime deadlineDateTime = LocalDateTime.parse(deadlineDateString);
             Task deadlineTask = new Deadline(description, deadlineDateTime);
             setTaskCompletionStatus(deadlineTask, statusFlag);
+            setTaskPriority(deadlineTask, priorityString);
             
-            // Load tags if present (index 4 for Deadline)
-            if (parts.length > 4 && !parts[4].trim().isEmpty()) {
-                loadTagsIntoTask(deadlineTask, parts[4]);
+            // Load tags if present (index 5 for Deadline)
+            if (parts.length > 5 && !parts[5].trim().isEmpty()) {
+                loadTagsIntoTask(deadlineTask, parts[5]);
             }
             
             return deadlineTask;
@@ -342,6 +347,7 @@ public class Storage {
         String startDateString = parts[EVENT_START_INDEX];
         String endDateString = parts[EVENT_END_INDEX];
         String statusFlag = parts[STATUS_INDEX];
+        String priorityString = parts[PRIORITY_INDEX];
         
         try {
             LocalDateTime startDateTime = LocalDateTime.parse(startDateString);
@@ -351,10 +357,11 @@ public class Storage {
             
             Task eventTask = new Event(description, startDateTime, endDateTime);
             setTaskCompletionStatus(eventTask, statusFlag);
+            setTaskPriority(eventTask, priorityString);
             
-            // Load tags if present (index 5 for Event)
-            if (parts.length > 5 && !parts[5].trim().isEmpty()) {
-                loadTagsIntoTask(eventTask, parts[5]);
+            // Load tags if present (index 6 for Event)
+            if (parts.length > 6 && !parts[6].trim().isEmpty()) {
+                loadTagsIntoTask(eventTask, parts[6]);
             }
             
             return eventTask;
@@ -428,6 +435,34 @@ public class Storage {
         
         if (!DONE_FLAG_TRUE.equals(doneFlag) && !DONE_FLAG_FALSE.equals(doneFlag)) {
             throw new ReiExceptions("OOPS!!! Invalid completion status in data file: " + doneFlag);
+        }
+    }
+
+    /**
+     * Sets the priority of a task based on the priority string from file.
+     * 
+     * @param task the task to update
+     * @param priorityString the priority level as a string (0-3)
+     * @throws ReiExceptions if priority string is invalid
+     */
+    private void setTaskPriority(Task task, String priorityString) throws ReiExceptions {
+        if (task == null) {
+            throw new ReiExceptions("Task cannot be null");
+        }
+        
+        if (priorityString == null || priorityString.trim().isEmpty()) {
+            task.setPriority(Priority.NONE);
+            return;
+        }
+        
+        try {
+            int level = Integer.parseInt(priorityString.trim());
+            Priority priority = Priority.fromLevel(level);
+            task.setPriority(priority);
+        } catch (NumberFormatException e) {
+            throw new ReiExceptions("OOPS!!! Invalid priority format in data file: " + priorityString);
+        } catch (IllegalArgumentException e) {
+            throw new ReiExceptions("OOPS!!! Invalid priority level in data file: " + priorityString);
         }
     }
 

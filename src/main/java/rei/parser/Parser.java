@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import rei.command.*;
+import rei.task.Priority;
 
 /**
  * Parses user input strings and converts them into appropriate Command objects.
@@ -54,6 +55,7 @@ public class Parser {
     private static final String SOURCE_COMMAND_PREFIX = "source ";
     private static final String TAG_COMMAND_PREFIX = "tag ";
     private static final String UNTAG_COMMAND_PREFIX = "untag ";
+    private static final String PRIORITY_COMMAND_PREFIX = "priority ";
 
     /**
      * Parses the user input string and returns the corresponding Command object.
@@ -186,6 +188,10 @@ public class Parser {
         
         if (input.startsWith(UNTAG_COMMAND_PREFIX)) {
             return parseUntagCommand(input);
+        }
+        
+        if (input.startsWith(PRIORITY_COMMAND_PREFIX)) {
+            return parsePriorityCommand(input);
         }
         
         return null; // No parameterized command matches
@@ -535,6 +541,68 @@ public class Parser {
             return new UntagCommand(taskIndex, tag);
         } catch (NumberFormatException e) {
             throw new ReiExceptions("OOPS!!! Task number must be a number.");
+        }
+    }
+    
+    /**
+     * Parses priority command from input string.
+     * Format: "priority <index> <level>" where level can be HIGH, MEDIUM, LOW, or a number 1-3.
+     * 
+     * @param input the input string starting with "priority "
+     * @return PriorityCommand object
+     * @throws ReiExceptions if format is invalid
+     */
+    private static Command parsePriorityCommand(String input) throws ReiExceptions {
+        String arguments = extractSubstring(input, PRIORITY_COMMAND_PREFIX.length());
+        
+        if (arguments.isEmpty()) {
+            throw new ReiExceptions("OOPS!!! Priority command requires a task number and priority level.");
+        }
+        
+        String[] parts = arguments.split(" ", 2);
+        
+        if (parts.length < 2) {
+            throw new ReiExceptions("OOPS!!! Priority command requires both task number and priority level.");
+        }
+        
+        try {
+            int userProvidedIndex = Integer.parseInt(parts[0].trim());
+            int taskIndex = convertToArrayIndex(userProvidedIndex);
+            String priorityStr = parts[1].trim();
+            
+            if (priorityStr.isEmpty()) {
+                throw new ReiExceptions("OOPS!!! Priority level cannot be empty.");
+            }
+            
+            Priority priority = parsePriorityLevel(priorityStr);
+            
+            return new PriorityCommand(taskIndex, priority);
+        } catch (NumberFormatException e) {
+            throw new ReiExceptions("OOPS!!! Task number must be a number.");
+        }
+    }
+    
+    /**
+     * Parses a priority level from string input.
+     * Accepts both names (HIGH, MEDIUM, LOW) and numbers (1, 2, 3).
+     * 
+     * @param priorityStr the priority string
+     * @return the Priority enum value
+     * @throws ReiExceptions if priority is invalid
+     */
+    private static Priority parsePriorityLevel(String priorityStr) throws ReiExceptions {
+        try {
+            // Try to parse as number first
+            int level = Integer.parseInt(priorityStr);
+            return Priority.fromLevel(level);
+        } catch (NumberFormatException e) {
+            // Try to parse as name (HIGH, MEDIUM, LOW)
+            try {
+                return Priority.fromString(priorityStr);
+            } catch (IllegalArgumentException ex) {
+                throw new ReiExceptions("OOPS!!! Invalid priority level: " + priorityStr 
+                        + ". Use HIGH/MEDIUM/LOW or 1/2/3.");
+            }
         }
     }
     

@@ -46,7 +46,7 @@ public class Event extends Task {
     @Override
     public String toFileString() {
         return "E | " + super.toFileString()
-                + " | " + start + " | " + end;
+                + " | " + start + " | " + end + getTagsForFile();
     }
 
     /**

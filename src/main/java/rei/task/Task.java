@@ -15,6 +15,7 @@ public abstract class Task {
     private boolean isDone;
     private final long insertionOrder;
     private Set<String> tags;
+    private Priority priority;
 
     /**
      * Constructs a new task with the given description.
@@ -30,6 +31,7 @@ public abstract class Task {
         this.isDone = false;
         this.insertionOrder = nextInsertionOrder++;
         this.tags = new HashSet<>();
+        this.priority = Priority.NONE;
     }
 
     /**
@@ -102,6 +104,25 @@ public abstract class Task {
      */
     public long getInsertionOrder() {
         return insertionOrder;
+    }
+
+    /**
+     * Gets the priority of this task.
+     *
+     * @return the priority level
+     */
+    public Priority getPriority() {
+        return priority;
+    }
+
+    /**
+     * Sets the priority of this task.
+     *
+     * @param priority the new priority level
+     */
+    public void setPriority(Priority priority) {
+        assert priority != null : "Priority cannot be null";
+        this.priority = priority;
     }
 
     /**
@@ -195,7 +216,9 @@ public abstract class Task {
      */
     @Override
     public String toString() {
-        return getStatusIcon() + " " + description + formatTags();
+        String priorityStr = priority.toDisplayString();
+        String prefix = priorityStr.isEmpty() ? "" : priorityStr + " ";
+        return getStatusIcon() + " " + prefix + description + formatTags();
     }
 
     /**
@@ -204,11 +227,20 @@ public abstract class Task {
      * @return a formatted string suitable for saving to file
      */
     public String toFileString() {
+        return getDoneFlag() + " | " + priority.toFileString() + " | " + description;
+    }
+    
+    /**
+     * Returns the tags formatted for file storage, with pipe separator prefix if tags exist.
+     * 
+     * @return empty string if no tags, otherwise " | tags"
+     */
+    protected String getTagsForFile() {
         String tagsString = formatTagsForFile();
         if (tagsString.isEmpty()) {
-            return getDoneFlag() + " | " + description;
+            return "";
         }
-        return getDoneFlag() + " | " + description + " | " + tagsString;
+        return " | " + tagsString;
     }
 
     /**
