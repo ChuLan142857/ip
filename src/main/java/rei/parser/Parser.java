@@ -31,6 +31,7 @@ public class Parser {
     private static final String BYE_COMMAND = "bye";
     private static final String LIST_COMMAND = "list";
     private static final String SOURCE_COMMAND = "source";
+    private static final String SORT_COMMAND = "sort";
     private static final String FIND_COMMAND_PREFIX = "find ";
     private static final String TODO_COMMAND_PREFIX = "todo";
     private static final String DEADLINE_COMMAND_PREFIX = "deadline";
@@ -104,6 +105,10 @@ public class Parser {
         
         if (input.equals(SOURCE_COMMAND)) {
             return new SourceCommand(); // Query current source
+        }
+        
+        if (input.equals(SORT_COMMAND)) {
+            return new SortCommand();
         }
         
         return null; // No simple command matches

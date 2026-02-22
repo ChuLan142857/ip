@@ -84,4 +84,13 @@ public class Deadline extends Task {
     public int hashCode() {
         return getDescription().hashCode() * 31 + ddl.hashCode();
     }
+
+    /**
+     * Gets the deadline date and time.
+     *
+     * @return the deadline date and time
+     */
+    public LocalDateTime getDeadline() {
+        return ddl;
+    }
 }

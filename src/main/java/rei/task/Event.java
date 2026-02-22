@@ -94,4 +94,22 @@ public class Event extends Task {
         result = 31 * result + end.hashCode();
         return result;
     }
+
+    /**
+     * Gets the start date and time of the event.
+     *
+     * @return the start date and time
+     */
+    public LocalDateTime getStart() {
+        return start;
+    }
+
+    /**
+     * Gets the end date and time of the event.
+     *
+     * @return the end date and time
+     */
+    public LocalDateTime getEnd() {
+        return end;
+    }
 }
