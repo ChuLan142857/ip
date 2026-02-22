@@ -15,16 +15,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 /**
- * Command to archive completed tasks to a separate file.
- * Removes completed tasks from the active list and saves them to an archive file.
+ * Command to archive all tasks to a separate file and start with a clean slate.
+ * Saves all tasks (completed and non-completed) to an archive file and clears the task list.
  */
 public class ArchiveCommand extends Command {
     private static final DateTimeFormatter TIMESTAMP_FORMAT = 
             DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     /**
-     * Executes the archive command by moving all completed tasks to an archive file.
-     * Also saves the updated task list to storage and displays confirmation to the user.
+     * Executes the archive command by saving all tasks to an archive file.
+     * Clears the task list completely for a fresh start.
      *
      * @param tasks the TaskList to archive from
      * @param ui the Ui for displaying confirmation messages
@@ -36,18 +36,10 @@ public class ArchiveCommand extends Command {
             throws ReiExceptions {
 
         ArrayList<Task> allTasks = tasks.getAll();
-        ArrayList<Task> completedTasks = new ArrayList<>();
-        
-        // Collect all completed tasks
-        for (Task task : allTasks) {
-            if (task.isDone()) {
-                completedTasks.add(task);
-            }
-        }
 
-        if (completedTasks.isEmpty()) {
+        if (allTasks.isEmpty()) {
             ui.showLine();
-            ui.show("No completed tasks to archive.");
+            ui.show("No tasks to archive. Your list is already empty.");
             ui.showLine();
             return;
         }
@@ -55,25 +47,23 @@ public class ArchiveCommand extends Command {
         // Generate archive file name with timestamp
         String archiveFileName = generateArchiveFileName(storage);
         
-        // Write completed tasks to archive file
-        writeToArchiveFile(archiveFileName, completedTasks);
+        // Write all tasks to archive file
+        writeToArchiveFile(archiveFileName, allTasks);
 
-        // Remove completed tasks from the task list
-        int removedCount = 0;
+        int totalCount = allTasks.size();
+
+        // Remove all tasks from the task list
         for (int i = allTasks.size() - 1; i >= 0; i--) {
-            if (allTasks.get(i).isDone()) {
-                tasks.remove(i);
-                removedCount++;
-            }
+            tasks.remove(i);
         }
 
-        // Save the updated task list
+        // Save the empty task list
         storage.save(tasks);
 
         ui.showLine();
-        ui.show("Archived " + removedCount + " completed task(s) to:");
+        ui.show("Archived " + totalCount + " task(s) to:");
         ui.show(archiveFileName);
-        ui.show("Your task list has been updated.");
+        ui.show("Your task list has been cleared. Starting with a clean slate!");
         ui.showLine();
     }
 
