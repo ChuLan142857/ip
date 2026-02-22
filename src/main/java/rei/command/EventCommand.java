@@ -49,7 +49,7 @@ public class EventCommand extends Command {
         if (tasks.hasDuplicate(newTask)) {
             ui.showLine();
             ui.show("WARNING: This task already exists in your list!");
-            boolean confirmed = ui.readConfirmation("Are you sure you want to add this task?");
+            boolean confirmed = ui.readConfirmation("Are you sure you want to add this task? (y/n)");
             
             if (!confirmed) {
                 ui.showLine();
