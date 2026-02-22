@@ -14,6 +14,7 @@ import rei.ui.GuiUi;
 import rei.storage.Storage;
 import rei.list.TaskList;
 import rei.exceptions.ReiExceptions;
+import rei.exceptions.ConfirmationRequiredException;
 import rei.parser.Parser;
 import rei.command.Command;
 
@@ -46,6 +47,9 @@ public class ReiGui extends Application {
     private TextField userInput;
     private Button sendButton;
     private Scene scene;
+    
+    // State management for duplicate confirmation
+    private Command pendingCommand = null;
     
     // Application messages
     private static final String WINDOW_TITLE = "Rei Chatbot";
@@ -273,15 +277,57 @@ public class ReiGui extends Application {
      */
     private void processCommandAndShowResponse(String input) {
         try {
+            // Check if we're waiting for confirmation
+            if (pendingCommand != null) {
+                handleConfirmation(input);
+                return;
+            }
+            
             Command command = parseUserCommand(input);
             String response = executeCommand(command);
             displayBotResponse(response);
             
             handlePotentialExit(command);
             
+        } catch (ConfirmationRequiredException e) {
+            handleConfirmationRequest(e);
         } catch (ReiExceptions e) {
             displayErrorResponse(e.getMessage());
         }
+    }
+    
+    /**
+     * Handles user confirmation when a pending command is waiting.
+     * 
+     * @param input the user's input (should be y/n)
+     */
+    private void handleConfirmation(String input) {
+        String trimmedInput = input.trim().toLowerCase();
+        
+        if (trimmedInput.equals("y") || trimmedInput.equals("yes")) {
+            try {
+                String response = executeCommand(pendingCommand);
+                displayBotResponse(response);
+            } catch (ReiExceptions e) {
+                displayErrorResponse(e.getMessage());
+            }
+        } else if (trimmedInput.equals("n") || trimmedInput.equals("no")) {
+            displayBotResponse("Task not added.");
+        } else {
+            displayBotResponse("Invalid confirmation. Please type 'y' or 'n'.\\nTask not added.");
+        }
+        
+        pendingCommand = null; // Clear pending state
+    }
+    
+    /**
+     * Handles a confirmation request from a command.
+     * 
+     * @param e the confirmation exception containing the message and pending command
+     */
+    private void handleConfirmationRequest(ConfirmationRequiredException e) {
+        displayBotResponse(e.getMessage());
+        pendingCommand = e.getPendingCommand();
     }
     
     /**
