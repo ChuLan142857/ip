@@ -12,12 +12,14 @@ import rei.task.Todo;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Command to find and display tasks that match search criteria.
  * Performs flexible, case-insensitive partial matching across multiple fields:
  * - Task descriptions
  * - Task types (todo, deadline, event)
+ * - Task tags
  * Supports both AND and OR search modes:
  * - OR mode: matches if ANY keyword is found (default)
  * - AND mode: matches only if ALL keywords are found
@@ -88,6 +90,7 @@ public class FindCommand extends Command {
      * Performs case-insensitive partial matching against:
      * - Task description
      * - Task type name (todo, deadline, event)
+     * - Task tags
      * 
      * @param task the task to check
      * @param keywords the list of keywords to search for
@@ -96,14 +99,17 @@ public class FindCommand extends Command {
     private boolean matchesKeywords(Task task, List<String> keywords) {
         String description = task.getDescription().toLowerCase();
         String taskType = getTaskType(task).toLowerCase();
+        Set<String> tags = task.getTags();
         
         if (useAndLogic) {
             // AND logic: all keywords must match
             for (String keyword : keywords) {
                 String lowerKeyword = keyword.toLowerCase();
                 
-                // Check if keyword matches description or task type
-                if (!description.contains(lowerKeyword) && !taskType.contains(lowerKeyword)) {
+                // Check if keyword matches description, task type, or any tag
+                if (!description.contains(lowerKeyword) 
+                        && !taskType.contains(lowerKeyword)
+                        && !matchesAnyTag(tags, lowerKeyword)) {
                     return false; // If any keyword doesn't match, reject the task
                 }
             }
@@ -113,13 +119,35 @@ public class FindCommand extends Command {
             for (String keyword : keywords) {
                 String lowerKeyword = keyword.toLowerCase();
                 
-                // Check if keyword matches description or task type
-                if (description.contains(lowerKeyword) || taskType.contains(lowerKeyword)) {
+                // Check if keyword matches description, task type, or any tag
+                if (description.contains(lowerKeyword) 
+                        || taskType.contains(lowerKeyword)
+                        || matchesAnyTag(tags, lowerKeyword)) {
                     return true; // If any keyword matches, accept the task
                 }
             }
             return false; // No keywords matched
         }
+    }
+    
+    /**
+     * Checks if any tag contains the keyword.
+     * Supports searching with or without # prefix.
+     * 
+     * @param tags the set of tags to search
+     * @param keyword the keyword to search for (already lowercase)
+     * @return true if any tag contains the keyword
+     */
+    private boolean matchesAnyTag(Set<String> tags, String keyword) {
+        // Remove leading # if present (tags are stored without #)
+        String searchTerm = keyword.startsWith("#") ? keyword.substring(1) : keyword;
+        
+        for (String tag : tags) {
+            if (tag.contains(searchTerm)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

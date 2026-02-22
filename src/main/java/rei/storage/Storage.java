@@ -255,6 +255,12 @@ public class Storage {
         
         Task todoTask = new Todo(description);
         setTaskCompletionStatus(todoTask, statusFlag);
+        
+        // Load tags if present (index 3 for Todo)
+        if (parts.length > 3 && !parts[3].trim().isEmpty()) {
+            loadTagsIntoTask(todoTask, parts[3]);
+        }
+        
         return todoTask;
     }
     
@@ -293,6 +299,12 @@ public class Storage {
             LocalDateTime deadlineDateTime = LocalDateTime.parse(deadlineDateString);
             Task deadlineTask = new Deadline(description, deadlineDateTime);
             setTaskCompletionStatus(deadlineTask, statusFlag);
+            
+            // Load tags if present (index 4 for Deadline)
+            if (parts.length > 4 && !parts[4].trim().isEmpty()) {
+                loadTagsIntoTask(deadlineTask, parts[4]);
+            }
+            
             return deadlineTask;
         } catch (Exception e) {
             throw new ReiExceptions("OOPS!!! Invalid deadline date format in data file.");
@@ -339,6 +351,12 @@ public class Storage {
             
             Task eventTask = new Event(description, startDateTime, endDateTime);
             setTaskCompletionStatus(eventTask, statusFlag);
+            
+            // Load tags if present (index 5 for Event)
+            if (parts.length > 5 && !parts[5].trim().isEmpty()) {
+                loadTagsIntoTask(eventTask, parts[5]);
+            }
+            
             return eventTask;
         } catch (Exception e) {
             throw new ReiExceptions("OOPS!!! Invalid event date format in data file.");
@@ -410,6 +428,26 @@ public class Storage {
         
         if (!DONE_FLAG_TRUE.equals(doneFlag) && !DONE_FLAG_FALSE.equals(doneFlag)) {
             throw new ReiExceptions("OOPS!!! Invalid completion status in data file: " + doneFlag);
+        }
+    }
+
+    /**
+     * Loads tags from a comma-separated string into a task.
+     * 
+     * @param task the task to load tags into
+     * @param tagsString comma-separated list of tags
+     */
+    private void loadTagsIntoTask(Task task, String tagsString) {
+        if (tagsString == null || tagsString.trim().isEmpty()) {
+            return;
+        }
+        
+        String[] tags = tagsString.split(",");
+        for (String tag : tags) {
+            String trimmedTag = tag.trim();
+            if (!trimmedTag.isEmpty()) {
+                task.addTag(trimmedTag);
+            }
         }
     }
 

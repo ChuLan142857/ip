@@ -28,6 +28,8 @@ public class Parser {
     private static final int DELETE_COMMAND_PREFIX_LENGTH = 7;
     private static final int UPDATE_COMMAND_PREFIX_LENGTH = 7;
     private static final int CLONE_COMMAND_PREFIX_LENGTH = 6;
+    private static final int TAG_COMMAND_PREFIX_LENGTH = 4;
+    private static final int UNTAG_COMMAND_PREFIX_LENGTH = 6;
     
     // Constants for validation requirements
     private static final int MINIMUM_EVENT_PARTS = 3;
@@ -50,6 +52,8 @@ public class Parser {
     private static final String UPDATE_COMMAND_PREFIX = "update ";
     private static final String CLONE_COMMAND_PREFIX = "clone ";
     private static final String SOURCE_COMMAND_PREFIX = "source ";
+    private static final String TAG_COMMAND_PREFIX = "tag ";
+    private static final String UNTAG_COMMAND_PREFIX = "untag ";
 
     /**
      * Parses the user input string and returns the corresponding Command object.
@@ -174,6 +178,14 @@ public class Parser {
         
         if (input.startsWith(CLONE_COMMAND_PREFIX)) {
             return parseCloneCommand(input);
+        }
+        
+        if (input.startsWith(TAG_COMMAND_PREFIX)) {
+            return parseTagCommand(input);
+        }
+        
+        if (input.startsWith(UNTAG_COMMAND_PREFIX)) {
+            return parseUntagCommand(input);
         }
         
         return null; // No parameterized command matches
@@ -452,6 +464,78 @@ public class Parser {
     private static Command parseCloneCommand(String input) throws ReiExceptions {
         int taskIndex = parseIndex(input, CLONE_COMMAND_PREFIX_LENGTH);
         return new CloneCommand(taskIndex);
+    }
+    
+    /**
+     * Parses tag command from input string.
+     * Format: "tag <index> <tag>"
+     * 
+     * @param input the input string starting with "tag "
+     * @return TagCommand object
+     * @throws ReiExceptions if format is invalid
+     */
+    private static Command parseTagCommand(String input) throws ReiExceptions {
+        String arguments = extractSubstring(input, TAG_COMMAND_PREFIX_LENGTH);
+        
+        if (arguments.isEmpty()) {
+            throw new ReiExceptions("OOPS!!! Tag command requires a task number and a tag.");
+        }
+        
+        String[] parts = arguments.split(" ", 2);
+        
+        if (parts.length < 2) {
+            throw new ReiExceptions("OOPS!!! Tag command requires both task number and tag.");
+        }
+        
+        try {
+            int userProvidedIndex = Integer.parseInt(parts[0].trim());
+            int taskIndex = convertToArrayIndex(userProvidedIndex);
+            String tag = parts[1].trim();
+            
+            if (tag.isEmpty()) {
+                throw new ReiExceptions("OOPS!!! Tag cannot be empty.");
+            }
+            
+            return new TagCommand(taskIndex, tag);
+        } catch (NumberFormatException e) {
+            throw new ReiExceptions("OOPS!!! Task number must be a number.");
+        }
+    }
+    
+    /**
+     * Parses untag command from input string.
+     * Format: "untag <index> <tag>"
+     * 
+     * @param input the input string starting with "untag "
+     * @return UntagCommand object
+     * @throws ReiExceptions if format is invalid
+     */
+    private static Command parseUntagCommand(String input) throws ReiExceptions {
+        String arguments = extractSubstring(input, UNTAG_COMMAND_PREFIX_LENGTH);
+        
+        if (arguments.isEmpty()) {
+            throw new ReiExceptions("OOPS!!! Untag command requires a task number and a tag.");
+        }
+        
+        String[] parts = arguments.split(" ", 2);
+        
+        if (parts.length < 2) {
+            throw new ReiExceptions("OOPS!!! Untag command requires both task number and tag.");
+        }
+        
+        try {
+            int userProvidedIndex = Integer.parseInt(parts[0].trim());
+            int taskIndex = convertToArrayIndex(userProvidedIndex);
+            String tag = parts[1].trim();
+            
+            if (tag.isEmpty()) {
+                throw new ReiExceptions("OOPS!!! Tag cannot be empty.");
+            }
+            
+            return new UntagCommand(taskIndex, tag);
+        } catch (NumberFormatException e) {
+            throw new ReiExceptions("OOPS!!! Task number must be a number.");
+        }
     }
     
     /**
