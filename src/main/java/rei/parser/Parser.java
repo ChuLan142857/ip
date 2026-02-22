@@ -594,13 +594,18 @@ public class Parser {
         try {
             // Try to parse as number first
             int level = Integer.parseInt(priorityStr);
-            return Priority.fromLevel(level);
+            try {
+                return Priority.fromLevel(level);
+            } catch (IllegalArgumentException e) {
+                throw new ReiExceptions("OOPS!!! Invalid priority level: " + priorityStr 
+                        + ". Valid levels are 1 (HIGH), 2 (MEDIUM), 3 (LOW).");
+            }
         } catch (NumberFormatException e) {
             // Try to parse as name (HIGH, MEDIUM, LOW)
             try {
                 return Priority.fromString(priorityStr);
             } catch (IllegalArgumentException ex) {
-                throw new ReiExceptions("OOPS!!! Invalid priority level: " + priorityStr 
+                throw new ReiExceptions("OOPS!!! Invalid priority: " + priorityStr 
                         + ". Use HIGH/MEDIUM/LOW or 1/2/3.");
             }
         }

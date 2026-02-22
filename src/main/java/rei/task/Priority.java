@@ -56,7 +56,8 @@ public enum Priority {
                 return p;
             }
         }
-        throw new IllegalArgumentException("Invalid priority level: " + level);
+        throw new IllegalArgumentException("Invalid priority level: " + level 
+                + ". Valid levels are: 1 (HIGH), 2 (MEDIUM), 3 (LOW), 0 (NONE)");
     }
 
     /**
@@ -77,7 +78,8 @@ public enum Priority {
                 return p;
             }
         }
-        throw new IllegalArgumentException("Invalid priority: " + str);
+        throw new IllegalArgumentException("Invalid priority: " + str 
+                + ". Valid values are: HIGH, MEDIUM, LOW, NONE");
     }
 
     /**
