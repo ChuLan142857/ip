@@ -73,7 +73,7 @@ public class ClearCommand extends Command {
 
         ui.showLine();
         ui.show("Cleared " + removedCount + " completed task(s) and recorded in:");
-        ui.show(completedFilePath);
+        ui.show(normalizePathDisplay(completedFilePath));
         ui.show("Your active task list has been updated.");
         ui.showLine();
     }
@@ -93,6 +93,16 @@ public class ClearCommand extends Command {
             return directory + File.separator + COMPLETED_FILE_NAME;
         }
         return COMPLETED_FILE_NAME;
+    }
+
+    /**
+     * Normalizes file path display to use forward slashes for consistency.
+     * 
+     * @param filePath the file path to normalize
+     * @return the normalized path with forward slashes
+     */
+    private String normalizePathDisplay(String filePath) {
+        return filePath.replace(File.separator, "/");
     }
 
     /**

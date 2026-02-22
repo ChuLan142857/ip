@@ -62,7 +62,7 @@ public class ArchiveCommand extends Command {
 
         ui.showLine();
         ui.show("Archived " + totalCount + " task(s) to:");
-        ui.show(archiveFileName);
+        ui.show(normalizePathDisplay(archiveFileName));
         ui.show("Your task list has been cleared. Starting with a clean slate!");
         ui.showLine();
     }
@@ -85,6 +85,16 @@ public class ArchiveCommand extends Command {
             return directory + File.separator + archiveFileName;
         }
         return archiveFileName;
+    }
+
+    /**
+     * Normalizes file path display to use forward slashes for consistency.
+     * 
+     * @param filePath the file path to normalize
+     * @return the normalized path with forward slashes
+     */
+    private String normalizePathDisplay(String filePath) {
+        return filePath.replace(File.separator, "/");
     }
 
     /**

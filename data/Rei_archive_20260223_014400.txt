@@ -1,0 +1,4 @@
+T | 0 | 2 | sleep
+D | 0 | 0 | iP | 2026-02-23T23:59
+T | 0 | 0 | read book
+T | 0 | 0 | wake up | important
