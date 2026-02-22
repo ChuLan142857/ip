@@ -26,6 +26,8 @@ public class Parser {
     private static final int MARK_COMMAND_PREFIX_LENGTH = 5;
     private static final int UNMARK_COMMAND_PREFIX_LENGTH = 7;
     private static final int DELETE_COMMAND_PREFIX_LENGTH = 7;
+    private static final int UPDATE_COMMAND_PREFIX_LENGTH = 7;
+    private static final int CLONE_COMMAND_PREFIX_LENGTH = 6;
     
     // Constants for validation requirements
     private static final int MINIMUM_EVENT_PARTS = 3;
@@ -45,6 +47,8 @@ public class Parser {
     private static final String MARK_COMMAND_PREFIX = "mark ";
     private static final String UNMARK_COMMAND_PREFIX = "unmark ";
     private static final String DELETE_COMMAND_PREFIX = "delete ";
+    private static final String UPDATE_COMMAND_PREFIX = "update ";
+    private static final String CLONE_COMMAND_PREFIX = "clone ";
     private static final String SOURCE_COMMAND_PREFIX = "source ";
 
     /**
@@ -162,6 +166,14 @@ public class Parser {
         
         if (input.startsWith(DELETE_COMMAND_PREFIX)) {
             return parseDeleteCommand(input);
+        }
+        
+        if (input.startsWith(UPDATE_COMMAND_PREFIX)) {
+            return parseUpdateCommand(input);
+        }
+        
+        if (input.startsWith(CLONE_COMMAND_PREFIX)) {
+            return parseCloneCommand(input);
         }
         
         return null; // No parameterized command matches
@@ -342,6 +354,104 @@ public class Parser {
     private static Command parseDeleteCommand(String input) throws ReiExceptions {
         int taskIndex = parseIndex(input, DELETE_COMMAND_PREFIX_LENGTH);
         return new DeleteCommand(taskIndex);
+    }
+    
+    /**
+     * Parses update command from input string.
+     * Format: "update <index> /desc <description>" or
+     *         "update <index> /by <deadline>" or
+     *         "update <index> /from <start> /to <end>"
+     * 
+     * @param input the input string starting with "update "
+     * @return UpdateCommand object
+     * @throws ReiExceptions if format is invalid
+     */
+    private static Command parseUpdateCommand(String input) throws ReiExceptions {
+        String arguments = extractSubstring(input, UPDATE_COMMAND_PREFIX_LENGTH);
+        
+        if (arguments.isEmpty()) {
+            throw new ReiExceptions("Update command requires a task number and update details.");
+        }
+        
+        // Split by first space to separate index from the rest
+        String[] parts = arguments.split("\\s+", 2);
+        if (parts.length < 2) {
+            throw new ReiExceptions("Update command requires update details after the task number.");
+        }
+        
+        int taskIndex;
+        try {
+            int userProvidedIndex = Integer.parseInt(parts[0]);
+            taskIndex = convertToArrayIndex(userProvidedIndex);
+        } catch (NumberFormatException e) {
+            throw new ReiExceptions("OOPS!!! Task number must be a number.");
+        }
+        
+        String details = parts[1].trim();
+        
+        // Check for /desc (description update)
+        if (details.startsWith("/desc ")) {
+            String newDescription = details.substring(6).trim();
+            if (newDescription.isEmpty()) {
+                throw new ReiExceptions("Description cannot be empty.");
+            }
+            return new UpdateCommand(taskIndex, newDescription);
+        }
+        
+        // Check for /by (deadline update)
+        if (details.startsWith("/by ")) {
+            String dateStr = details.substring(4).trim();
+            if (dateStr.isEmpty()) {
+                throw new ReiExceptions("Deadline date cannot be empty.");
+            }
+            LocalDateTime deadline = parseDate(dateStr);
+            return new UpdateCommand(taskIndex, deadline);
+        }
+        
+        // Check for /from and /to (event update)
+        if (details.contains("/from") || details.contains("/to")) {
+            String[] eventParts = details.split(" /from | /to ");
+            LocalDateTime start = null;
+            LocalDateTime end = null;
+            
+            if (details.contains("/from")) {
+                int fromIndex = details.indexOf("/from");
+                int toIndex = details.indexOf("/to");
+                
+                if (toIndex > fromIndex) {
+                    // Both /from and /to present
+                    String startStr = details.substring(fromIndex + 6, toIndex).trim();
+                    String endStr = details.substring(toIndex + 4).trim();
+                    start = parseDate(startStr);
+                    end = parseDate(endStr);
+                } else {
+                    // Only /from present
+                    String startStr = details.substring(fromIndex + 6).trim();
+                    start = parseDate(startStr);
+                }
+            } else {
+                // Only /to present
+                int toIndex = details.indexOf("/to");
+                String endStr = details.substring(toIndex + 4).trim();
+                end = parseDate(endStr);
+            }
+            
+            return new UpdateCommand(taskIndex, start, end);
+        }
+        
+        throw new ReiExceptions("Invalid update format. Use /desc, /by, /from, or /to to specify what to update.");
+    }
+    
+    /**
+     * Parses clone command from input string.
+     * 
+     * @param input the input string starting with "clone "
+     * @return CloneCommand object
+     * @throws ReiExceptions if index is invalid
+     */
+    private static Command parseCloneCommand(String input) throws ReiExceptions {
+        int taskIndex = parseIndex(input, CLONE_COMMAND_PREFIX_LENGTH);
+        return new CloneCommand(taskIndex);
     }
     
     /**

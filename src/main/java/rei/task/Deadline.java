@@ -93,4 +93,14 @@ public class Deadline extends Task {
     public LocalDateTime getDeadline() {
         return ddl;
     }
+
+    /**
+     * Sets the deadline date and time.
+     *
+     * @param ddl the new deadline date and time
+     */
+    public void setDeadline(LocalDateTime ddl) {
+        assert ddl != null : "Deadline date cannot be null";
+        this.ddl = ddl;
+    }
 }

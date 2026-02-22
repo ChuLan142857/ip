@@ -112,4 +112,24 @@ public class Event extends Task {
     public LocalDateTime getEnd() {
         return end;
     }
+
+    /**
+     * Sets the start date and time of the event.
+     *
+     * @param start the new start date and time
+     */
+    public void setStart(LocalDateTime start) {
+        assert start != null : "Event start time cannot be null";
+        this.start = start;
+    }
+
+    /**
+     * Sets the end date and time of the event.
+     *
+     * @param end the new end date and time
+     */
+    public void setEnd(LocalDateTime end) {
+        assert end != null : "Event end time cannot be null";
+        this.end = end;
+    }
 }

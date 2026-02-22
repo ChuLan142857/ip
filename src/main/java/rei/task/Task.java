@@ -78,6 +78,17 @@ public abstract class Task {
     }
 
     /**
+     * Sets the description of this task.
+     *
+     * @param description the new task description
+     */
+    public void setDescription(String description) {
+        assert description != null : "Task description cannot be null";
+        assert !description.trim().isEmpty() : "Task description cannot be empty";
+        this.description = description;
+    }
+
+    /**
      * Gets the insertion order of this task.
      * Used for sorting tasks back to their original order.
      *
