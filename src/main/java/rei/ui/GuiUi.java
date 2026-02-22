@@ -1,5 +1,8 @@
 package rei.ui;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+
 /**
  * A GUI-compatible UI class that collects output instead of printing to console.
  * Used by the JavaFX GUI to capture command responses.
@@ -72,16 +75,23 @@ public class GuiUi implements UiInterface {
     }
 
     /**
-     * In GUI mode, always returns true to confirm.
-     * GUI users don't have interactive confirmation.
+     * Shows a confirmation dialog in GUI mode using JavaFX Alert.
      *
-     * @param prompt the confirmation prompt (shown to user)
-     * @return true (always confirms in GUI mode)
+     * @param prompt the confirmation prompt to display
+     * @return true if the user clicks Yes, false if they click No
      */
     public boolean readConfirmation(String prompt) {
-        show(prompt);
-        // In GUI mode, we auto-confirm since we can't wait for user input
-        show("(Auto-confirmed in GUI mode)");
-        return true;
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation");
+        alert.setHeaderText("Duplicate Task Detected");
+        alert.setContentText(prompt);
+        
+        // Use YES/NO buttons instead of OK/Cancel
+        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+        
+        // Show dialog and wait for user response
+        return alert.showAndWait()
+                .filter(response -> response == ButtonType.YES)
+                .isPresent();
     }
 }

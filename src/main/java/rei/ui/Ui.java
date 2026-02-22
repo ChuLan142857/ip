@@ -64,7 +64,7 @@ public class Ui implements UiInterface {
      * @return true if the user confirms (y/yes), false otherwise
      */
     public boolean readConfirmation(String prompt) {
-        show(prompt);
+        show(prompt + " (y/n)");
         String response = scanner.nextLine().trim().toLowerCase();
         return response.equals("y") || response.equals("yes");
     }
