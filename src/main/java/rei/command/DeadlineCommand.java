@@ -29,7 +29,7 @@ public class DeadlineCommand extends Command {
 
     /**
      * Executes the deadline command by creating a new deadline task and adding it to the task list.
-     * Checks for duplicates before adding. If a duplicate exists, warns the user but still adds it.
+     * Checks for duplicates before adding. If a duplicate exists, asks for user confirmation.
      * Also saves the updated task list to storage and displays confirmation to the user.
      *
      * @param tasks the TaskList to add the new deadline task to
@@ -45,7 +45,14 @@ public class DeadlineCommand extends Command {
         if (tasks.hasDuplicate(newTask)) {
             ui.showLine();
             ui.show("WARNING: This task already exists in your list!");
-            ui.show("Adding it anyway...");
+            boolean confirmed = ui.readConfirmation("Are you sure you want to add this task? (y/n)");
+            
+            if (!confirmed) {
+                ui.showLine();
+                ui.show("Task not added.");
+                ui.showLine();
+                return;
+            }
         }
 
         tasks.add(newTask);
