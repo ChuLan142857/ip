@@ -91,7 +91,7 @@ public class Storage {
             return tasks;
             
         } catch (IOException e) {
-            throw new ReiExceptions("OOPS!!! Unable to load tasks from file.");
+            throw new ReiExceptions("Error detected: Unable to load tasks from file.");
         }
     }
     
@@ -171,7 +171,7 @@ public class Storage {
             }
             
         } catch (IOException e) {
-            throw new ReiExceptions("OOPS!!! Unable to save tasks to file.");
+            throw new ReiExceptions("Error detected: Unable to save tasks to file.");
         }
     }
     
@@ -214,7 +214,7 @@ public class Storage {
             return createEventFromParts(parts);
         } else {
             // Explicit default case for unknown task types
-            throw new ReiExceptions("OOPS!!! Unknown task type in data file: " + taskType);
+            throw new ReiExceptions("Error detected: Unknown task type in data file: " + taskType);
         }
     }
     
@@ -236,7 +236,7 @@ public class Storage {
      */
     private void validateTaskParts(String[] parts) throws ReiExceptions {
         if (parts.length < MINIMUM_TASK_PARTS) {
-            throw new ReiExceptions("OOPS!!! Corrupted data file - insufficient parts.");
+            throw new ReiExceptions("Error detected: Corrupted data file - insufficient parts.");
         }
     }
 
@@ -275,11 +275,11 @@ public class Storage {
      */
     private void validateTodoParts(String[] parts) throws ReiExceptions {
         if (parts.length < MINIMUM_TODO_PARTS) {
-            throw new ReiExceptions("OOPS!!! Invalid Todo format in data file.");
+            throw new ReiExceptions("Error detected: Invalid Todo format in data file.");
         }
         
         if (!TODO_TYPE_IDENTIFIER.equals(parts[TYPE_INDEX])) {
-            throw new ReiExceptions("OOPS!!! Expected Todo type identifier.");
+            throw new ReiExceptions("Error detected: Expected Todo type identifier.");
         }
     }
 
@@ -312,7 +312,7 @@ public class Storage {
             
             return deadlineTask;
         } catch (Exception e) {
-            throw new ReiExceptions("OOPS!!! Invalid deadline date format in data file.");
+            throw new ReiExceptions("Error detected: Invalid deadline date format in data file.");
         }
     }
     
@@ -324,11 +324,11 @@ public class Storage {
      */
     private void validateDeadlineParts(String[] parts) throws ReiExceptions {
         if (parts.length < MINIMUM_DEADLINE_PARTS) {
-            throw new ReiExceptions("OOPS!!! Invalid Deadline format in data file.");
+            throw new ReiExceptions("Error detected: Invalid Deadline format in data file.");
         }
         
         if (!DEADLINE_TYPE_IDENTIFIER.equals(parts[TYPE_INDEX])) {
-            throw new ReiExceptions("OOPS!!! Expected Deadline type identifier.");
+            throw new ReiExceptions("Error detected: Expected Deadline type identifier.");
         }
     }
 
@@ -366,7 +366,7 @@ public class Storage {
             
             return eventTask;
         } catch (Exception e) {
-            throw new ReiExceptions("OOPS!!! Invalid event date format in data file.");
+            throw new ReiExceptions("Error detected: Invalid event date format in data file.");
         }
     }
     
@@ -378,11 +378,11 @@ public class Storage {
      */
     private void validateEventParts(String[] parts) throws ReiExceptions {
         if (parts.length < MINIMUM_EVENT_PARTS) {
-            throw new ReiExceptions("OOPS!!! Invalid Event format in data file.");
+            throw new ReiExceptions("Error detected: Invalid Event format in data file.");
         }
         
         if (!EVENT_TYPE_IDENTIFIER.equals(parts[TYPE_INDEX])) {
-            throw new ReiExceptions("OOPS!!! Expected Event type identifier.");
+            throw new ReiExceptions("Error detected: Expected Event type identifier.");
         }
     }
     
@@ -396,7 +396,7 @@ public class Storage {
     private void validateEventDateLogic(LocalDateTime startDateTime, LocalDateTime endDateTime) 
             throws ReiExceptions {
         if (startDateTime.isAfter(endDateTime)) {
-            throw new ReiExceptions("OOPS!!! Event start time cannot be after end time.");
+            throw new ReiExceptions("Error detected: Event start time cannot be after end time.");
         }
     }
 
@@ -434,7 +434,7 @@ public class Storage {
         }
         
         if (!DONE_FLAG_TRUE.equals(doneFlag) && !DONE_FLAG_FALSE.equals(doneFlag)) {
-            throw new ReiExceptions("OOPS!!! Invalid completion status in data file: " + doneFlag);
+            throw new ReiExceptions("Error detected: Invalid completion status in data file: " + doneFlag);
         }
     }
 
@@ -460,9 +460,9 @@ public class Storage {
             Priority priority = Priority.fromLevel(level);
             task.setPriority(priority);
         } catch (NumberFormatException e) {
-            throw new ReiExceptions("OOPS!!! Invalid priority format in data file: " + priorityString);
+            throw new ReiExceptions("Error detected: Invalid priority format in data file: " + priorityString);
         } catch (IllegalArgumentException e) {
-            throw new ReiExceptions("OOPS!!! Invalid priority level in data file: " + priorityString);
+            throw new ReiExceptions("Error detected: Invalid priority level in data file: " + priorityString);
         }
     }
 

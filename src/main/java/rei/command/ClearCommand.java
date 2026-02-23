@@ -131,7 +131,7 @@ public class ClearCommand extends Command {
             // Add a blank line for separation
             writer.newLine();
         } catch (IOException e) {
-            throw new ReiExceptions("OOPS!!! Unable to write to completed tasks file: " + completedFilePath);
+            throw new ReiExceptions("Error detected: Unable to write to completed tasks file: " + completedFilePath);
         }
     }
 }

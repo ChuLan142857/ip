@@ -42,7 +42,7 @@ public class UntagCommand extends Command {
         boolean removed = task.removeTag(tag);
         
         if (!removed) {
-            throw new ReiExceptions("OOPS!!! This task doesn't have the tag: " + tag);
+            throw new ReiExceptions("Error detected: This task doesn't have the tag: " + tag);
         }
         
         storage.save(tasks);

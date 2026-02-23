@@ -83,7 +83,7 @@ public class Parser {
         }
         
         // Default case for unrecognized commands
-        throw new ReiExceptions("OOPS!!! I'm sorry, but I don't know what that means :-(");
+        throw new ReiExceptions("Error detected: I'm sorry, but I don't know what that means :-(");
     }
     
     /**
@@ -255,7 +255,7 @@ public class Parser {
         String filePath = input.substring(SOURCE_COMMAND_PREFIX.length()).trim();
         
         if (filePath.isEmpty()) {
-            throw new ReiExceptions("OOPS!!! The file path cannot be empty.");
+            throw new ReiExceptions("Error detected: The file path cannot be empty.");
         }
         
         return new SourceCommand(filePath);
@@ -272,7 +272,7 @@ public class Parser {
         String sortType = input.substring(SORT_COMMAND_PREFIX.length()).trim().toLowerCase();
         
         if (sortType.isEmpty()) {
-            throw new ReiExceptions("OOPS!!! Please specify sort type: 'insertion' or 'date'.");
+            throw new ReiExceptions("Error detected: Please specify sort type: 'insertion' or 'date'.");
         }
         
         if (sortType.equals("insertion") || sortType.equals("original")) {
@@ -280,7 +280,7 @@ public class Parser {
         } else if (sortType.equals("date") || sortType.equals("chronological")) {
             return new SortCommand(false);
         } else {
-            throw new ReiExceptions("OOPS!!! Invalid sort type. Use 'insertion', 'original', 'date', or 'chronological'.");
+            throw new ReiExceptions("Error detected: Invalid sort type. Use 'insertion', 'original', 'date', or 'chronological'.");
         }
     }
     
@@ -293,7 +293,7 @@ public class Parser {
      */
     private static Command parseTodoCommand(String input) throws ReiExceptions {
         if (input.length() <= TODO_COMMAND_PREFIX_LENGTH) {
-            throw new ReiExceptions("OOPS!!! The description of a todo cannot be empty.");
+            throw new ReiExceptions("Error detected: The description of a todo cannot be empty.");
         }
         
         String description = extractSubstring(input, TODO_COMMAND_PREFIX_LENGTH);
@@ -309,21 +309,21 @@ public class Parser {
      */
     private static Command parseDeadlineCommand(String input) throws ReiExceptions {
         if (!input.contains(DEADLINE_SEPARATOR)) {
-            throw new ReiExceptions("OOPS!!! Deadline must have /by.");
+            throw new ReiExceptions("Error detected: Deadline must have /by.");
         }
         
         String[] parts = input.split(DEADLINE_SEPARATOR);
         String description = parts[0].replace(DEADLINE_COMMAND_PREFIX, "").trim();
         
         if (description.isEmpty()) {
-            throw new ReiExceptions("OOPS!!! The description cannot be empty.");
+            throw new ReiExceptions("Error detected: The description cannot be empty.");
         }
         
         try {
             LocalDateTime deadlineDateTime = parseDate(parts[1].trim());
             return new DeadlineCommand(description, deadlineDateTime);
         } catch (Exception e) {
-            throw new ReiExceptions("OOPS!!! Please use yyyy-MM-dd HH:mm format.");
+            throw new ReiExceptions("Error detected: Please use yyyy-MM-dd HH:mm format.");
         }
     }
     
@@ -338,7 +338,7 @@ public class Parser {
         String[] parts = input.split(EVENT_SEPARATOR_REGEX);
         
         if (parts.length < MINIMUM_EVENT_PARTS) {
-            throw new ReiExceptions("OOPS!!! An event must have /from and /to.");
+            throw new ReiExceptions("Error detected: An event must have /from and /to.");
         }
         
         String description = parts[0].substring(EVENT_COMMAND_PREFIX_LENGTH).trim();
@@ -412,7 +412,7 @@ public class Parser {
             int userProvidedIndex = Integer.parseInt(parts[0]);
             taskIndex = convertToArrayIndex(userProvidedIndex);
         } catch (NumberFormatException e) {
-            throw new ReiExceptions("OOPS!!! Task number must be a number.");
+            throw new ReiExceptions("Error detected: Task number must be a number.");
         }
         
         String details = parts[1].trim();
@@ -494,13 +494,13 @@ public class Parser {
         String arguments = extractSubstring(input, TAG_COMMAND_PREFIX_LENGTH);
         
         if (arguments.isEmpty()) {
-            throw new ReiExceptions("OOPS!!! Tag command requires a task number and a tag.");
+            throw new ReiExceptions("Error detected: Tag command requires a task number and a tag.");
         }
         
         String[] parts = arguments.split(" ", 2);
         
         if (parts.length < 2) {
-            throw new ReiExceptions("OOPS!!! Tag command requires both task number and tag.");
+            throw new ReiExceptions("Error detected: Tag command requires both task number and tag.");
         }
         
         try {
@@ -509,12 +509,12 @@ public class Parser {
             String tag = parts[1].trim();
             
             if (tag.isEmpty()) {
-                throw new ReiExceptions("OOPS!!! Tag cannot be empty.");
+                throw new ReiExceptions("Error detected: Tag cannot be empty.");
             }
             
             return new TagCommand(taskIndex, tag);
         } catch (NumberFormatException e) {
-            throw new ReiExceptions("OOPS!!! Task number must be a number.");
+            throw new ReiExceptions("Error detected: Task number must be a number.");
         }
     }
     
@@ -530,13 +530,13 @@ public class Parser {
         String arguments = extractSubstring(input, UNTAG_COMMAND_PREFIX_LENGTH);
         
         if (arguments.isEmpty()) {
-            throw new ReiExceptions("OOPS!!! Untag command requires a task number and a tag.");
+            throw new ReiExceptions("Error detected: Untag command requires a task number and a tag.");
         }
         
         String[] parts = arguments.split(" ", 2);
         
         if (parts.length < 2) {
-            throw new ReiExceptions("OOPS!!! Untag command requires both task number and tag.");
+            throw new ReiExceptions("Error detected: Untag command requires both task number and tag.");
         }
         
         try {
@@ -545,12 +545,12 @@ public class Parser {
             String tag = parts[1].trim();
             
             if (tag.isEmpty()) {
-                throw new ReiExceptions("OOPS!!! Tag cannot be empty.");
+                throw new ReiExceptions("Error detected: Tag cannot be empty.");
             }
             
             return new UntagCommand(taskIndex, tag);
         } catch (NumberFormatException e) {
-            throw new ReiExceptions("OOPS!!! Task number must be a number.");
+            throw new ReiExceptions("Error detected: Task number must be a number.");
         }
     }
     
@@ -566,13 +566,13 @@ public class Parser {
         String arguments = extractSubstring(input, PRIORITY_COMMAND_PREFIX.length());
         
         if (arguments.isEmpty()) {
-            throw new ReiExceptions("OOPS!!! Priority command requires a task number and priority level.");
+            throw new ReiExceptions("Error detected: Priority command requires a task number and priority level.");
         }
         
         String[] parts = arguments.split(" ", 2);
         
         if (parts.length < 2) {
-            throw new ReiExceptions("OOPS!!! Priority command requires both task number and priority level.");
+            throw new ReiExceptions("Error detected: Priority command requires both task number and priority level.");
         }
         
         try {
@@ -581,14 +581,14 @@ public class Parser {
             String priorityStr = parts[1].trim();
             
             if (priorityStr.isEmpty()) {
-                throw new ReiExceptions("OOPS!!! Priority level cannot be empty.");
+                throw new ReiExceptions("Error detected: Priority level cannot be empty.");
             }
             
             Priority priority = parsePriorityLevel(priorityStr);
             
             return new PriorityCommand(taskIndex, priority);
         } catch (NumberFormatException e) {
-            throw new ReiExceptions("OOPS!!! Task number must be a number.");
+            throw new ReiExceptions("Error detected: Task number must be a number.");
         }
     }
     
@@ -607,7 +607,7 @@ public class Parser {
             try {
                 return Priority.fromLevel(level);
             } catch (IllegalArgumentException e) {
-                throw new ReiExceptions("OOPS!!! Invalid priority level: " + priorityStr 
+                throw new ReiExceptions("Error detected: Invalid priority level: " + priorityStr 
                         + ". Valid levels are 1 (HIGH), 2 (MEDIUM), 3 (LOW).");
             }
         } catch (NumberFormatException e) {
@@ -615,7 +615,7 @@ public class Parser {
             try {
                 return Priority.fromString(priorityStr);
             } catch (IllegalArgumentException ex) {
-                throw new ReiExceptions("OOPS!!! Invalid priority: " + priorityStr 
+                throw new ReiExceptions("Error detected: Invalid priority: " + priorityStr 
                         + ". Use HIGH/MEDIUM/LOW or 1/2/3.");
             }
         }
@@ -651,7 +651,7 @@ public class Parser {
         String indexString = extractSubstring(input, startPosition);
         
         if (indexString.isEmpty()) {
-            throw new ReiExceptions("OOPS!!! Task number cannot be empty.");
+            throw new ReiExceptions("Error detected: Task number cannot be empty.");
         }
         
         try {
@@ -659,7 +659,7 @@ public class Parser {
             int arrayIndex = convertToArrayIndex(userProvidedIndex);
             return arrayIndex;
         } catch (NumberFormatException e) {
-            throw new ReiExceptions("OOPS!!! Task number must be a number.");
+            throw new ReiExceptions("Error detected: Task number must be a number.");
         }
     }
     
@@ -693,7 +693,7 @@ public class Parser {
      */
     private static int convertToArrayIndex(int userIndex) throws ReiExceptions {
         if (userIndex <= 0) {
-            throw new ReiExceptions("OOPS!!! Task number must be positive.");
+            throw new ReiExceptions("Error detected: Task number must be positive.");
         }
         
         return userIndex - 1; // Convert to 0-based indexing

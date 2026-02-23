@@ -134,7 +134,7 @@ public class TaskList {
         assert tasks != null : "Task list should be initialized";
         assert index >= -1 : "Index should not be extremely negative"; // Additional safety check
         if (index < 0 || index >= tasks.size()) {
-            throw new ReiExceptions("OOPS!!! That task number is invalid.");
+            throw new ReiExceptions("Error detected: That task number is invalid.");
         }
     }
 }
