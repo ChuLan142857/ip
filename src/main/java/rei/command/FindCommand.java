@@ -5,27 +5,54 @@ import rei.ui.UiInterface;
 import rei.storage.Storage;
 import rei.exceptions.ReiExceptions;
 import rei.task.Task;
+import rei.task.Deadline;
+import rei.task.Event;
+import rei.task.Todo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 /**
- * Command to find and display tasks that contain a specific keyword.
- * Performs case-insensitive search through task descriptions.
+ * Command to find and display tasks that match search criteria.
+ * Performs flexible, case-insensitive partial matching across multiple fields:
+ * - Task descriptions
+ * - Task types (todo, deadline, event)
+ * - Task tags
+ * Supports both AND and OR search modes:
+ * - OR mode: matches if ANY keyword is found (default)
+ * - AND mode: matches only if ALL keywords are found
  */
 public class FindCommand extends Command {
     private final String keyword;
+    private final boolean useAndLogic;
 
     /**
-     * Constructs a new FindCommand with the specified search keyword.
+     * Constructs a new FindCommand with the specified search keyword(s).
+     * Multiple keywords can be space-separated.
+     * Uses OR logic by default.
      *
-     * @param keyword the keyword to search for in task descriptions
+     * @param keyword the keyword(s) to search for
      */
     public FindCommand(String keyword) {
-        this.keyword = keyword;
+        this(keyword, false);
     }
 
     /**
-     * Executes the find command by searching for tasks containing the keyword.
+     * Constructs a new FindCommand with the specified search keyword(s) and logic mode.
+     * Multiple keywords can be space-separated.
+     *
+     * @param keyword the keyword(s) to search for
+     * @param useAndLogic true for AND logic, false for OR logic
+     */
+    public FindCommand(String keyword, boolean useAndLogic) {
+        this.keyword = keyword;
+        this.useAndLogic = useAndLogic;
+    }
+
+    /**
+     * Executes the find command by searching for tasks matching the keyword(s).
      * Displays all matching tasks or a message if no matches are found.
      *
      * @param tasks the TaskList to search through
@@ -34,24 +61,110 @@ public class FindCommand extends Command {
      */
     @Override
     public void execute(TaskList tasks, UiInterface ui, Storage storage) {
+        // Split keyword into multiple search terms
+        List<String> searchTerms = Arrays.asList(keyword.trim().split("\\s+"));
         ArrayList<Task> matches = new ArrayList<>();
 
         for (Task task : tasks.getAll()) {
-            if (task.getDescription().toLowerCase().contains(keyword.toLowerCase())) {
+            if (matchesKeywords(task, searchTerms)) {
                 matches.add(task);
             }
         }
 
         ui.showLine();
         if (matches.isEmpty()) {
-            ui.show("No tasks match the keyword: " + keyword);
+            ui.show("No tasks match the search: " + keyword);
         } else {
-            ui.show("Here are the matching tasks in your list:");
+            String searchMode = useAndLogic ? "AND" : "OR";
+            ui.show("Here are the matching tasks in your list (" + searchMode + " search):");
             for (int i = 0; i < matches.size(); i++) {
                 ui.show((i + 1) + ". " + matches.get(i));
             }
+            ui.show("\nFound " + matches.size() + " matching task(s).");
         }
         ui.showLine();
+    }
+
+    /**
+     * Checks if a task matches the search keywords according to the search mode.
+     * Performs case-insensitive partial matching against:
+     * - Task description
+     * - Task type name (todo, deadline, event)
+     * - Task tags
+     * 
+     * @param task the task to check
+     * @param keywords the list of keywords to search for
+     * @return true if the task matches according to AND/OR logic
+     */
+    private boolean matchesKeywords(Task task, List<String> keywords) {
+        String description = task.getDescription().toLowerCase();
+        String taskType = getTaskType(task).toLowerCase();
+        Set<String> tags = task.getTags();
+        
+        if (useAndLogic) {
+            // AND logic: all keywords must match
+            for (String keyword : keywords) {
+                String lowerKeyword = keyword.toLowerCase();
+                
+                // Check if keyword matches description, task type, or any tag
+                if (!description.contains(lowerKeyword) 
+                        && !taskType.contains(lowerKeyword)
+                        && !matchesAnyTag(tags, lowerKeyword)) {
+                    return false; // If any keyword doesn't match, reject the task
+                }
+            }
+            return true; // All keywords matched
+        } else {
+            // OR logic: any keyword can match
+            for (String keyword : keywords) {
+                String lowerKeyword = keyword.toLowerCase();
+                
+                // Check if keyword matches description, task type, or any tag
+                if (description.contains(lowerKeyword) 
+                        || taskType.contains(lowerKeyword)
+                        || matchesAnyTag(tags, lowerKeyword)) {
+                    return true; // If any keyword matches, accept the task
+                }
+            }
+            return false; // No keywords matched
+        }
+    }
+    
+    /**
+     * Checks if any tag contains the keyword.
+     * Supports searching with or without # prefix.
+     * 
+     * @param tags the set of tags to search
+     * @param keyword the keyword to search for (already lowercase)
+     * @return true if any tag contains the keyword
+     */
+    private boolean matchesAnyTag(Set<String> tags, String keyword) {
+        // Remove leading # if present (tags are stored without #)
+        String searchTerm = keyword.startsWith("#") ? keyword.substring(1) : keyword;
+        
+        for (String tag : tags) {
+            if (tag.contains(searchTerm)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Gets the type name of a task.
+     * 
+     * @param task the task
+     * @return "todo", "deadline", or "event"
+     */
+    private String getTaskType(Task task) {
+        if (task instanceof Todo) {
+            return "todo";
+        } else if (task instanceof Deadline) {
+            return "deadline";
+        } else if (task instanceof Event) {
+            return "event";
+        }
+        return "";
     }
 
 }

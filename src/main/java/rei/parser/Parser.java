@@ -1,9 +1,12 @@
 package rei.parser;
 
 import rei.exceptions.ReiExceptions;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import rei.command.*;
+import rei.task.Priority;
 
 /**
  * Parses user input strings and converts them into appropriate Command objects.
@@ -11,8 +14,11 @@ import rei.command.*;
  */
 public class Parser {
 
-    private static final DateTimeFormatter INPUT_FORMAT =
+    private static final DateTimeFormatter INPUT_FORMAT_WITH_TIME =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private static final DateTimeFormatter INPUT_FORMAT_DATE_ONLY =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final LocalTime DEFAULT_TIME = LocalTime.of(23, 59);
     
     // Constants for string parsing offsets to avoid magic numbers
     private static final int FIND_COMMAND_PREFIX_LENGTH = 5;
@@ -21,6 +27,10 @@ public class Parser {
     private static final int MARK_COMMAND_PREFIX_LENGTH = 5;
     private static final int UNMARK_COMMAND_PREFIX_LENGTH = 7;
     private static final int DELETE_COMMAND_PREFIX_LENGTH = 7;
+    private static final int UPDATE_COMMAND_PREFIX_LENGTH = 7;
+    private static final int CLONE_COMMAND_PREFIX_LENGTH = 6;
+    private static final int TAG_COMMAND_PREFIX_LENGTH = 4;
+    private static final int UNTAG_COMMAND_PREFIX_LENGTH = 6;
     
     // Constants for validation requirements
     private static final int MINIMUM_EVENT_PARTS = 3;
@@ -30,6 +40,11 @@ public class Parser {
     // Command keywords
     private static final String BYE_COMMAND = "bye";
     private static final String LIST_COMMAND = "list";
+    private static final String SOURCE_COMMAND = "source";
+    private static final String SORT_COMMAND = "sort";
+    private static final String ARCHIVE_COMMAND = "archive";
+    private static final String CLEAR_COMMAND = "clear";
+    private static final String SORT_COMMAND_PREFIX = "sort ";
     private static final String FIND_COMMAND_PREFIX = "find ";
     private static final String TODO_COMMAND_PREFIX = "todo";
     private static final String DEADLINE_COMMAND_PREFIX = "deadline";
@@ -37,6 +52,12 @@ public class Parser {
     private static final String MARK_COMMAND_PREFIX = "mark ";
     private static final String UNMARK_COMMAND_PREFIX = "unmark ";
     private static final String DELETE_COMMAND_PREFIX = "delete ";
+    private static final String UPDATE_COMMAND_PREFIX = "update ";
+    private static final String CLONE_COMMAND_PREFIX = "clone ";
+    private static final String SOURCE_COMMAND_PREFIX = "source ";
+    private static final String TAG_COMMAND_PREFIX = "tag ";
+    private static final String UNTAG_COMMAND_PREFIX = "untag ";
+    private static final String PRIORITY_COMMAND_PREFIX = "priority ";
 
     /**
      * Parses the user input string and returns the corresponding Command object.
@@ -100,6 +121,22 @@ public class Parser {
             return new ListCommand();
         }
         
+        if (input.equals(SOURCE_COMMAND)) {
+            return new SourceCommand(); // Query current source
+        }
+        
+        if (input.equals(SORT_COMMAND)) {
+            return new SortCommand();
+        }
+        
+        if (input.equals(ARCHIVE_COMMAND)) {
+            return new ArchiveCommand();
+        }
+        
+        if (input.equals(CLEAR_COMMAND)) {
+            return new ClearCommand();
+        }
+        
         return null; // No simple command matches
     }
     
@@ -113,6 +150,14 @@ public class Parser {
     private static Command tryParseParameterizedCommands(String input) throws ReiExceptions {
         if (input.startsWith(FIND_COMMAND_PREFIX)) {
             return parseFindCommand(input);
+        }
+        
+        if (input.startsWith(SOURCE_COMMAND_PREFIX)) {
+            return parseSourceCommand(input);
+        }
+        
+        if (input.startsWith(SORT_COMMAND_PREFIX)) {
+            return parseSortCommand(input);
         }
         
         if (input.startsWith(TODO_COMMAND_PREFIX)) {
@@ -139,14 +184,37 @@ public class Parser {
             return parseDeleteCommand(input);
         }
         
+        if (input.startsWith(UPDATE_COMMAND_PREFIX)) {
+            return parseUpdateCommand(input);
+        }
+        
+        if (input.startsWith(CLONE_COMMAND_PREFIX)) {
+            return parseCloneCommand(input);
+        }
+        
+        if (input.startsWith(TAG_COMMAND_PREFIX)) {
+            return parseTagCommand(input);
+        }
+        
+        if (input.startsWith(UNTAG_COMMAND_PREFIX)) {
+            return parseUntagCommand(input);
+        }
+        
+        if (input.startsWith(PRIORITY_COMMAND_PREFIX)) {
+            return parsePriorityCommand(input);
+        }
+        
         return null; // No parameterized command matches
     }
     
     /**
      * Parses find command from input string.
+     * Supports both AND and OR search modes.
+     * Format: "find [AND|OR] keyword..."
+     * If no mode specified, defaults to OR.
      * 
      * @param input the input string starting with "find "
-     * @return FindCommand object
+     * @return FindCommand object with appropriate search mode
      * @throws ReiExceptions if keyword is missing
      */
     private static Command parseFindCommand(String input) throws ReiExceptions {
@@ -156,7 +224,64 @@ public class Parser {
             throw new ReiExceptions("Find command requires a keyword.");
         }
         
-        return new FindCommand(keyword);
+        // Check for AND/OR prefix
+        String upperKeyword = keyword.trim().toUpperCase();
+        boolean useAndLogic = false;
+        String actualKeyword = keyword;
+        
+        if (upperKeyword.startsWith("AND ")) {
+            useAndLogic = true;
+            actualKeyword = keyword.substring(4).trim();
+        } else if (upperKeyword.startsWith("OR ")) {
+            useAndLogic = false;
+            actualKeyword = keyword.substring(3).trim();
+        }
+        
+        if (actualKeyword.isEmpty()) {
+            throw new ReiExceptions("Find command requires at least one keyword after AND/OR.");
+        }
+        
+        return new FindCommand(actualKeyword, useAndLogic);
+    }
+    
+    /**
+     * Parses source command from input string.
+     * 
+     * @param input the input string starting with "source "
+     * @return SourceCommand object with the new file path
+     * @throws ReiExceptions if file path is empty
+     */
+    private static Command parseSourceCommand(String input) throws ReiExceptions {
+        String filePath = input.substring(SOURCE_COMMAND_PREFIX.length()).trim();
+        
+        if (filePath.isEmpty()) {
+            throw new ReiExceptions("OOPS!!! The file path cannot be empty.");
+        }
+        
+        return new SourceCommand(filePath);
+    }
+    
+    /**
+     * Parses sort command from input string.
+     * 
+     * @param input the input string starting with "sort "
+     * @return SortCommand object with the specified sort type
+     * @throws ReiExceptions if sort type is invalid
+     */
+    private static Command parseSortCommand(String input) throws ReiExceptions {
+        String sortType = input.substring(SORT_COMMAND_PREFIX.length()).trim().toLowerCase();
+        
+        if (sortType.isEmpty()) {
+            throw new ReiExceptions("OOPS!!! Please specify sort type: 'insertion' or 'date'.");
+        }
+        
+        if (sortType.equals("insertion") || sortType.equals("original")) {
+            return new SortCommand(true);
+        } else if (sortType.equals("date") || sortType.equals("chronological")) {
+            return new SortCommand(false);
+        } else {
+            throw new ReiExceptions("OOPS!!! Invalid sort type. Use 'insertion', 'original', 'date', or 'chronological'.");
+        }
     }
     
     /**
@@ -260,6 +385,243 @@ public class Parser {
     }
     
     /**
+     * Parses update command from input string.
+     * Format: "update <index> /desc <description>" or
+     *         "update <index> /by <deadline>" or
+     *         "update <index> /from <start> /to <end>"
+     * 
+     * @param input the input string starting with "update "
+     * @return UpdateCommand object
+     * @throws ReiExceptions if format is invalid
+     */
+    private static Command parseUpdateCommand(String input) throws ReiExceptions {
+        String arguments = extractSubstring(input, UPDATE_COMMAND_PREFIX_LENGTH);
+        
+        if (arguments.isEmpty()) {
+            throw new ReiExceptions("Update command requires a task number and update details.");
+        }
+        
+        // Split by first space to separate index from the rest
+        String[] parts = arguments.split("\\s+", 2);
+        if (parts.length < 2) {
+            throw new ReiExceptions("Update command requires update details after the task number.");
+        }
+        
+        int taskIndex;
+        try {
+            int userProvidedIndex = Integer.parseInt(parts[0]);
+            taskIndex = convertToArrayIndex(userProvidedIndex);
+        } catch (NumberFormatException e) {
+            throw new ReiExceptions("OOPS!!! Task number must be a number.");
+        }
+        
+        String details = parts[1].trim();
+        
+        // Check for /desc (description update)
+        if (details.startsWith("/desc ")) {
+            String newDescription = details.substring(6).trim();
+            if (newDescription.isEmpty()) {
+                throw new ReiExceptions("Description cannot be empty.");
+            }
+            return new UpdateCommand(taskIndex, newDescription);
+        }
+        
+        // Check for /by (deadline update)
+        if (details.startsWith("/by ")) {
+            String dateStr = details.substring(4).trim();
+            if (dateStr.isEmpty()) {
+                throw new ReiExceptions("Deadline date cannot be empty.");
+            }
+            LocalDateTime deadline = parseDate(dateStr);
+            return new UpdateCommand(taskIndex, deadline);
+        }
+        
+        // Check for /from and /to (event update)
+        if (details.contains("/from") || details.contains("/to")) {
+            String[] eventParts = details.split(" /from | /to ");
+            LocalDateTime start = null;
+            LocalDateTime end = null;
+            
+            if (details.contains("/from")) {
+                int fromIndex = details.indexOf("/from");
+                int toIndex = details.indexOf("/to");
+                
+                if (toIndex > fromIndex) {
+                    // Both /from and /to present
+                    String startStr = details.substring(fromIndex + 6, toIndex).trim();
+                    String endStr = details.substring(toIndex + 4).trim();
+                    start = parseDate(startStr);
+                    end = parseDate(endStr);
+                } else {
+                    // Only /from present
+                    String startStr = details.substring(fromIndex + 6).trim();
+                    start = parseDate(startStr);
+                }
+            } else {
+                // Only /to present
+                int toIndex = details.indexOf("/to");
+                String endStr = details.substring(toIndex + 4).trim();
+                end = parseDate(endStr);
+            }
+            
+            return new UpdateCommand(taskIndex, start, end);
+        }
+        
+        throw new ReiExceptions("Invalid update format. Use /desc, /by, /from, or /to to specify what to update.");
+    }
+    
+    /**
+     * Parses clone command from input string.
+     * 
+     * @param input the input string starting with "clone "
+     * @return CloneCommand object
+     * @throws ReiExceptions if index is invalid
+     */
+    private static Command parseCloneCommand(String input) throws ReiExceptions {
+        int taskIndex = parseIndex(input, CLONE_COMMAND_PREFIX_LENGTH);
+        return new CloneCommand(taskIndex);
+    }
+    
+    /**
+     * Parses tag command from input string.
+     * Format: "tag <index> <tag>"
+     * 
+     * @param input the input string starting with "tag "
+     * @return TagCommand object
+     * @throws ReiExceptions if format is invalid
+     */
+    private static Command parseTagCommand(String input) throws ReiExceptions {
+        String arguments = extractSubstring(input, TAG_COMMAND_PREFIX_LENGTH);
+        
+        if (arguments.isEmpty()) {
+            throw new ReiExceptions("OOPS!!! Tag command requires a task number and a tag.");
+        }
+        
+        String[] parts = arguments.split(" ", 2);
+        
+        if (parts.length < 2) {
+            throw new ReiExceptions("OOPS!!! Tag command requires both task number and tag.");
+        }
+        
+        try {
+            int userProvidedIndex = Integer.parseInt(parts[0].trim());
+            int taskIndex = convertToArrayIndex(userProvidedIndex);
+            String tag = parts[1].trim();
+            
+            if (tag.isEmpty()) {
+                throw new ReiExceptions("OOPS!!! Tag cannot be empty.");
+            }
+            
+            return new TagCommand(taskIndex, tag);
+        } catch (NumberFormatException e) {
+            throw new ReiExceptions("OOPS!!! Task number must be a number.");
+        }
+    }
+    
+    /**
+     * Parses untag command from input string.
+     * Format: "untag <index> <tag>"
+     * 
+     * @param input the input string starting with "untag "
+     * @return UntagCommand object
+     * @throws ReiExceptions if format is invalid
+     */
+    private static Command parseUntagCommand(String input) throws ReiExceptions {
+        String arguments = extractSubstring(input, UNTAG_COMMAND_PREFIX_LENGTH);
+        
+        if (arguments.isEmpty()) {
+            throw new ReiExceptions("OOPS!!! Untag command requires a task number and a tag.");
+        }
+        
+        String[] parts = arguments.split(" ", 2);
+        
+        if (parts.length < 2) {
+            throw new ReiExceptions("OOPS!!! Untag command requires both task number and tag.");
+        }
+        
+        try {
+            int userProvidedIndex = Integer.parseInt(parts[0].trim());
+            int taskIndex = convertToArrayIndex(userProvidedIndex);
+            String tag = parts[1].trim();
+            
+            if (tag.isEmpty()) {
+                throw new ReiExceptions("OOPS!!! Tag cannot be empty.");
+            }
+            
+            return new UntagCommand(taskIndex, tag);
+        } catch (NumberFormatException e) {
+            throw new ReiExceptions("OOPS!!! Task number must be a number.");
+        }
+    }
+    
+    /**
+     * Parses priority command from input string.
+     * Format: "priority <index> <level>" where level can be HIGH, MEDIUM, LOW, or a number 1-3.
+     * 
+     * @param input the input string starting with "priority "
+     * @return PriorityCommand object
+     * @throws ReiExceptions if format is invalid
+     */
+    private static Command parsePriorityCommand(String input) throws ReiExceptions {
+        String arguments = extractSubstring(input, PRIORITY_COMMAND_PREFIX.length());
+        
+        if (arguments.isEmpty()) {
+            throw new ReiExceptions("OOPS!!! Priority command requires a task number and priority level.");
+        }
+        
+        String[] parts = arguments.split(" ", 2);
+        
+        if (parts.length < 2) {
+            throw new ReiExceptions("OOPS!!! Priority command requires both task number and priority level.");
+        }
+        
+        try {
+            int userProvidedIndex = Integer.parseInt(parts[0].trim());
+            int taskIndex = convertToArrayIndex(userProvidedIndex);
+            String priorityStr = parts[1].trim();
+            
+            if (priorityStr.isEmpty()) {
+                throw new ReiExceptions("OOPS!!! Priority level cannot be empty.");
+            }
+            
+            Priority priority = parsePriorityLevel(priorityStr);
+            
+            return new PriorityCommand(taskIndex, priority);
+        } catch (NumberFormatException e) {
+            throw new ReiExceptions("OOPS!!! Task number must be a number.");
+        }
+    }
+    
+    /**
+     * Parses a priority level from string input.
+     * Accepts both names (HIGH, MEDIUM, LOW) and numbers (1, 2, 3).
+     * 
+     * @param priorityStr the priority string
+     * @return the Priority enum value
+     * @throws ReiExceptions if priority is invalid
+     */
+    private static Priority parsePriorityLevel(String priorityStr) throws ReiExceptions {
+        try {
+            // Try to parse as number first
+            int level = Integer.parseInt(priorityStr);
+            try {
+                return Priority.fromLevel(level);
+            } catch (IllegalArgumentException e) {
+                throw new ReiExceptions("OOPS!!! Invalid priority level: " + priorityStr 
+                        + ". Valid levels are 1 (HIGH), 2 (MEDIUM), 3 (LOW).");
+            }
+        } catch (NumberFormatException e) {
+            // Try to parse as name (HIGH, MEDIUM, LOW)
+            try {
+                return Priority.fromString(priorityStr);
+            } catch (IllegalArgumentException ex) {
+                throw new ReiExceptions("OOPS!!! Invalid priority: " + priorityStr 
+                        + ". Use HIGH/MEDIUM/LOW or 1/2/3.");
+            }
+        }
+    }
+    
+    /**
      * Extracts substring starting from given position with proper trimming.
      * 
      * @param input the input string
@@ -338,23 +700,42 @@ public class Parser {
     }
 
     /**
-     * Parses a date string into a LocalDateTime object using the expected format.
+     * Parses a date string into a LocalDateTime object.
+     * Supports natural language dates (e.g., "Mon", "today", "tomorrow"),
+     * standard format with time ("yyyy-MM-dd HH:mm"),
+     * and date-only format ("yyyy-MM-dd") which defaults to 23:59.
      * Provides clear error messages and proper validation.
      *
-     * @param dateString the date string to parse in "yyyy-MM-dd HH:mm" format
+     * @param dateString the date string to parse
      * @return the parsed LocalDateTime object
-     * @throws ReiExceptions if the date string is not in the expected format or is invalid
+     * @throws ReiExceptions if the date string is not in a recognized format or is invalid
      */
     private static LocalDateTime parseDate(String dateString) throws ReiExceptions {
         validateDateInput(dateString);
         
         String cleanedDateString = dateString.trim();
         
+        // Try natural date parsing first
+        if (NaturalDateParser.isNaturalDate(cleanedDateString)) {
+            try {
+                return NaturalDateParser.parse(cleanedDateString);
+            } catch (Exception e) {
+                throw new ReiExceptions("Invalid natural date format: " + e.getMessage());
+            }
+        }
+        
+        // Try standard format with time (yyyy-MM-dd HH:mm)
         try {
-            LocalDateTime parsedDateTime = LocalDateTime.parse(cleanedDateString, INPUT_FORMAT);
+            LocalDateTime parsedDateTime = LocalDateTime.parse(cleanedDateString, INPUT_FORMAT_WITH_TIME);
             return parsedDateTime;
         } catch (Exception e) {
-            throw new ReiExceptions("Please use yyyy-MM-dd HH:mm format!");
+            // If that fails, try date-only format (yyyy-MM-dd)
+            try {
+                LocalDate date = LocalDate.parse(cleanedDateString, INPUT_FORMAT_DATE_ONLY);
+                return LocalDateTime.of(date, DEFAULT_TIME);
+            } catch (Exception e2) {
+                throw new ReiExceptions("Please use yyyy-MM-dd or yyyy-MM-dd HH:mm format, or natural dates like 'Mon', 'today', 'tomorrow'!");
+            }
         }
     }
     

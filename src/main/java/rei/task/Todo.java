@@ -32,6 +32,35 @@ public class Todo extends Task {
      */
     @Override
     public String toFileString() {
-        return "T | " + super.toFileString();
+        return "T | " + super.toFileString() + getTagsForFile();
+    }
+
+    /**
+     * Checks if this todo is equal to another object.
+     * Two todos are equal if they are both Todo instances with the same description.
+     *
+     * @param obj the object to compare with
+     * @return true if the todos are equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Todo)) {
+            return false;
+        }
+        Todo other = (Todo) obj;
+        return this.getDescription().equals(other.getDescription());
+    }
+
+    /**
+     * Returns a hash code for this todo based on its description.
+     *
+     * @return a hash code value
+     */
+    @Override
+    public int hashCode() {
+        return getDescription().hashCode();
     }
 }

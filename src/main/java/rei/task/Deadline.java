@@ -41,7 +41,7 @@ public class Deadline extends Task {
     @Override
     public String toFileString() {
         return "D | " + super.toFileString()
-                + " | " + ddl;
+                + " | " + ddl + getTagsForFile();
     }
 
     /**
@@ -53,5 +53,54 @@ public class Deadline extends Task {
     private String formatDate(LocalDateTime dateTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy HH:mm");
         return dateTime.format(formatter);
+    }
+
+    /**
+     * Checks if this deadline is equal to another object.
+     * Two deadlines are equal if they have the same description and deadline.
+     *
+     * @param obj the object to compare with
+     * @return true if the deadlines are equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Deadline)) {
+            return false;
+        }
+        Deadline other = (Deadline) obj;
+        return this.getDescription().equals(other.getDescription())
+                && this.ddl.equals(other.ddl);
+    }
+
+    /**
+     * Returns a hash code for this deadline based on its description and deadline.
+     *
+     * @return a hash code value
+     */
+    @Override
+    public int hashCode() {
+        return getDescription().hashCode() * 31 + ddl.hashCode();
+    }
+
+    /**
+     * Gets the deadline date and time.
+     *
+     * @return the deadline date and time
+     */
+    public LocalDateTime getDeadline() {
+        return ddl;
+    }
+
+    /**
+     * Sets the deadline date and time.
+     *
+     * @param ddl the new deadline date and time
+     */
+    public void setDeadline(LocalDateTime ddl) {
+        assert ddl != null : "Deadline date cannot be null";
+        this.ddl = ddl;
     }
 }

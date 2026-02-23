@@ -5,8 +5,11 @@ import rei.ui.UiInterface;
 import rei.storage.Storage;
 import rei.list.TaskList;
 import rei.exceptions.ReiExceptions;
+import rei.exceptions.ConfirmationRequiredException;
 import rei.parser.Parser;
 import rei.command.Command;
+import rei.command.SourceCommand;
+import rei.command.PendingSourceCommand;
 
 /**
  * The main class for the Rei task management application.
@@ -20,8 +23,11 @@ public class Rei {
     
     // Core application components
     private final UiInterface ui;
-    private final Storage storage;
-    private final TaskList tasks;
+    private Storage storage;
+    private TaskList tasks;
+    
+    // State management for duplicate confirmation
+    private Command pendingCommand = null;
 
     /**
      * Constructs a new Rei application instance with default configuration.
@@ -162,11 +168,25 @@ public class Rei {
     private boolean processSingleCommand() {
         try {
             String userInput = getUserInput();
+            
+            // Check if we're waiting for confirmation
+            if (pendingCommand != null) {
+                return handleConfirmation(userInput);
+            }
+            
             Command command = parseCommand(userInput);
             executeCommand(command);
             
+            // Handle data source switching if this is a SourceCommand
+            if (command instanceof SourceCommand) {
+                handleSourceCommand((SourceCommand) command);
+            }
+            
             return shouldContinueAfterCommand(command);
             
+        } catch (ConfirmationRequiredException e) {
+            handleConfirmationRequest(e);
+            return true; // Continue and wait for user confirmation
         } catch (ReiExceptions e) {
             handleCommandError(e);
             return true; // Continue after error
@@ -234,6 +254,94 @@ public class Rei {
     private void handleCommandError(ReiExceptions error) {
         ui.showError(error.getMessage());
     }
+    
+    /**
+     * Handles user confirmation when a pending command is waiting.
+     * 
+     * @param userInput the user's input (should be y/n)
+     * @return true if the application should continue
+     */
+    private boolean handleConfirmation(String userInput) {
+        String input = userInput.trim().toLowerCase();
+        
+        if (input.equals("y") || input.equals("yes")) {
+            try {
+                pendingCommand.execute(tasks, ui, storage);
+                
+                // If this was a PendingSourceCommand, perform the actual switch
+                if (pendingCommand instanceof PendingSourceCommand) {
+                    PendingSourceCommand sourceCmd = (PendingSourceCommand) pendingCommand;
+                    switchDataSource(sourceCmd.getNewFilePath());
+                    ui.showLine();
+                    ui.show("Successfully switched to new data source!");
+                    ui.show("Loaded " + tasks.size() + " tasks from " + sourceCmd.getNewFilePath());
+                    ui.showLine();
+                }
+            } catch (ReiExceptions e) {
+                handleCommandError(e);
+            }
+        } else if (input.equals("n") || input.equals("no")) {
+            ui.showLine();
+            String cancelMessage = (pendingCommand instanceof PendingSourceCommand) 
+                ? "Data source not created." 
+                : "Task not added.";
+            ui.show(cancelMessage);
+            ui.showLine();
+        } else {
+            ui.showLine();
+            ui.show("Invalid confirmation. Please type 'y' or 'n'.");
+            String cancelMessage = (pendingCommand instanceof PendingSourceCommand) 
+                ? "Data source not created." 
+                : "Task not added.";
+            ui.show(cancelMessage);
+            ui.showLine();
+        }
+        
+        pendingCommand = null; // Clear pending state
+        return true;
+    }
+    
+    /**
+     * Handles a confirmation request from a command.
+     * 
+     * @param e the confirmation exception containing the message and pending command
+     */
+    private void handleConfirmationRequest(ConfirmationRequiredException e) {
+        ui.showLine();
+        ui.show(e.getMessage());
+        ui.showLine();
+        pendingCommand = e.getPendingCommand();
+    }
+    
+    /**
+     * Handles a source command by switching data sources if requested.
+     * 
+     * @param sourceCommand the source command to handle
+     * @throws ReiExceptions if there's an error switching data sources
+     */
+    private void handleSourceCommand(SourceCommand sourceCommand) throws ReiExceptions {
+        if (!sourceCommand.isQuery()) {
+            String newFilePath = sourceCommand.getNewFilePath();
+            try {
+                switchDataSource(newFilePath);
+                ui.showLine();
+                ui.show("Successfully switched to new data source!");
+                ui.show("Loaded " + tasks.size() + " tasks from " + newFilePath);
+                ui.showLine();
+            } catch (ReiExceptions e) {
+                throw new ReiExceptions("Failed to switch data source: " + e.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Sets a command as pending, waiting for user confirmation.
+     * 
+     * @param command the command to set as pending
+     */
+    public void setPendingCommand(Command command) {
+        this.pendingCommand = command;
+    }
 
     /**
      * Gets the task list for external access (e.g., GUI components).
@@ -253,6 +361,43 @@ public class Rei {
      */
     public Storage getStorage() {
         return storage;
+    }
+
+    /**
+     * Switches to a new data source file and reloads tasks from it.
+     * Saves current tasks to the existing storage before switching.
+     *
+     * @param newFilePath the path to the new data file
+     * @throws ReiExceptions if there's an error switching or loading from the new source
+     */
+    public void switchDataSource(String newFilePath) throws ReiExceptions {
+        // Validate new file path
+        if (newFilePath == null || newFilePath.trim().isEmpty()) {
+            throw new ReiExceptions("New file path cannot be null or empty");
+        }
+        
+        // Save current tasks before switching
+        if (tasks != null && storage != null) {
+            try {
+                storage.save(tasks);
+            } catch (ReiExceptions e) {
+                throw new ReiExceptions("Failed to save current tasks: " + e.getMessage());
+            }
+        }
+        
+        // Initialize new storage
+        try {
+            storage = initializeStorage(newFilePath);
+        } catch (Exception e) {
+            throw new ReiExceptions("Failed to initialize new storage: " + e.getMessage());
+        }
+        
+        // Reload tasks from new storage
+        try {
+            tasks = initializeTaskList();
+        } catch (Exception e) {
+            throw new ReiExceptions("Failed to load tasks from new source: " + e.getMessage());
+        }
     }
 
     /**

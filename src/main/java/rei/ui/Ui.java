@@ -57,4 +57,3 @@ public class Ui implements UiInterface {
         showLine();
     }
 }
-

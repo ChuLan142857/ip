@@ -46,7 +46,7 @@ public class Event extends Task {
     @Override
     public String toFileString() {
         return "E | " + super.toFileString()
-                + " | " + start + " | " + end;
+                + " | " + start + " | " + end + getTagsForFile();
     }
 
     /**
@@ -59,5 +59,77 @@ public class Event extends Task {
     {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy HH:mm");
         return dt.format(formatter);
+    }
+
+    /**
+     * Checks if this event is equal to another object.
+     * Two events are equal if they have the same description, start time, and end time.
+     *
+     * @param obj the object to compare with
+     * @return true if the events are equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Event)) {
+            return false;
+        }
+        Event other = (Event) obj;
+        return this.getDescription().equals(other.getDescription())
+                && this.start.equals(other.start)
+                && this.end.equals(other.end);
+    }
+
+    /**
+     * Returns a hash code for this event based on its description, start, and end times.
+     *
+     * @return a hash code value
+     */
+    @Override
+    public int hashCode() {
+        int result = getDescription().hashCode();
+        result = 31 * result + start.hashCode();
+        result = 31 * result + end.hashCode();
+        return result;
+    }
+
+    /**
+     * Gets the start date and time of the event.
+     *
+     * @return the start date and time
+     */
+    public LocalDateTime getStart() {
+        return start;
+    }
+
+    /**
+     * Gets the end date and time of the event.
+     *
+     * @return the end date and time
+     */
+    public LocalDateTime getEnd() {
+        return end;
+    }
+
+    /**
+     * Sets the start date and time of the event.
+     *
+     * @param start the new start date and time
+     */
+    public void setStart(LocalDateTime start) {
+        assert start != null : "Event start time cannot be null";
+        this.start = start;
+    }
+
+    /**
+     * Sets the end date and time of the event.
+     *
+     * @param end the new end date and time
+     */
+    public void setEnd(LocalDateTime end) {
+        assert end != null : "Event end time cannot be null";
+        this.end = end;
     }
 }

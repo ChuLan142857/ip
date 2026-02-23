@@ -33,6 +33,22 @@ public class TaskList {
     }
 
     /**
+     * Checks if the task list already contains a duplicate of the given task.
+     *
+     * @param task the task to check for duplicates
+     * @return true if a duplicate exists, false otherwise
+     */
+    public boolean hasDuplicate(Task task) {
+        assert task != null : "Cannot check for duplicates with null task";
+        for (Task t : tasks) {
+            if (t.equals(task)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Retrieves a task at the specified index.
      *
      * @param index the 0-based index of the task to retrieve
