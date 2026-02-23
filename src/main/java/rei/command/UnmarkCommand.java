@@ -39,8 +39,9 @@ public class UnmarkCommand extends Command {
         storage.save(tasks);
 
         ui.showLine();
-        ui.show("OK, I've marked this task as not done yet:");
+        ui.show("Fine, I've marked this task as not done yet:");
         ui.show(tasks.get(index).toString());
+        ui.show("What's the problem? I'm a bit worried.");
         ui.showLine();
     }
 }

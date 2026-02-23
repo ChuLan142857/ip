@@ -2,6 +2,7 @@ plugins {
     application
     java
     id("org.openjfx.javafxplugin") version "0.0.14"
+    id("com.gradleup.shadow") version "8.3.5"
 }
 
 repositories {
@@ -83,6 +84,30 @@ tasks.jar {
     
     // Prevent duplicates
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+// Configure Shadow JAR for fat JAR with all dependencies
+tasks.shadowJar {
+    archiveBaseName.set("Rei")
+    archiveVersion.set("")
+    archiveClassifier.set("")
+    
+    manifest {
+        attributes(
+            "Main-Class" to "rei.Launcher"
+        )
+    }
+    
+    // Prevent duplicates
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    
+    // Merge service files to avoid conflicts
+    mergeServiceFiles()
+}
+
+// Make build task depend on shadowJar
+tasks.build {
+    dependsOn(tasks.shadowJar)
 }
 
 // Configure source and test directories (they're already in standard locations)

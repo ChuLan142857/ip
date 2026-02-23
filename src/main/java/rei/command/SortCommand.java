@@ -51,7 +51,7 @@ public class SortCommand extends Command {
         
         if (tasks.size() == 0) {
             ui.showLine();
-            ui.show("Your task list is empty. Nothing to sort.");
+            ui.show("Your task list is empty. I don't know the meaning of sorting here");
             ui.showLine();
             return;
         }
@@ -69,10 +69,10 @@ public class SortCommand extends Command {
         
         ui.showLine();
         if (sortByInsertion) {
-            ui.show("Tasks sorted by insertion order!");
+            ui.show("Tasks sorted by insertion order.");
             ui.show("Tasks are now in the order they were added.");
         } else {
-            ui.show("Tasks sorted chronologically!");
+            ui.show("Tasks sorted chronologically.");
             ui.show("Deadlines and events are sorted by date, todos are at the end.");
         }
         ui.showLine();

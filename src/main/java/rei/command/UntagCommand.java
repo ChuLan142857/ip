@@ -48,7 +48,7 @@ public class UntagCommand extends Command {
         storage.save(tasks);
 
         ui.showLine();
-        ui.show("Got it! I've removed the tag from this task:");
+        ui.show("Got it. I've removed the tag from this task:");
         ui.show(task.toString());
         ui.showLine();
     }

@@ -43,7 +43,8 @@ public class TodoCommand extends Command {
             PendingTaskCommand pendingCommand = new PendingTaskCommand(newTask);
             throw new ConfirmationRequiredException(
                 "WARNING: This task already exists in your list!\n" +
-                "Are you sure you want to add this task? (y/n)",
+                "Are you sure you want to add this task?\n" +
+                "Answer me with yes or no (y/n)",
                 pendingCommand
             );
         }

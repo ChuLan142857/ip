@@ -44,7 +44,7 @@ public class CloneCommand extends Command {
         storage.save(tasks);
         
         ui.showLine();
-        ui.show("Got it! I've cloned this task:");
+        ui.show("Got it. I've cloned this task:");
         ui.show("  " + clonedTask);
         ui.show("Now you have " + tasks.size() + " tasks in the list.");
         ui.showLine();

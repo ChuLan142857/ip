@@ -43,7 +43,7 @@ public class TagCommand extends Command {
         storage.save(tasks);
 
         ui.showLine();
-        ui.show("Got it! I've added the tag to this task:");
+        ui.show("Got it. I've added the tag to this task:");
         ui.show(task.toString());
         ui.showLine();
     }

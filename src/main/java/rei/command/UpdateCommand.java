@@ -84,7 +84,7 @@ public class UpdateCommand extends Command {
             storage.save(tasks);
             
             ui.showLine();
-            ui.show("Got it! I've updated this task:");
+            ui.show("Got it. I've updated this task:");
             ui.show("  " + task);
             ui.showLine();
             return;
@@ -101,7 +101,7 @@ public class UpdateCommand extends Command {
             storage.save(tasks);
             
             ui.showLine();
-            ui.show("Got it! I've updated the deadline:");
+            ui.show("Got it. I've updated the deadline:");
             ui.show("  " + task);
             ui.showLine();
             return;
@@ -123,7 +123,7 @@ public class UpdateCommand extends Command {
             storage.save(tasks);
             
             ui.showLine();
-            ui.show("Got it! I've updated the event:");
+            ui.show("Got it. I've updated the event:");
             ui.show("  " + task);
             ui.showLine();
             return;

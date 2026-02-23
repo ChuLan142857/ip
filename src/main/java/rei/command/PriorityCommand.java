@@ -43,7 +43,7 @@ public class PriorityCommand extends Command {
         storage.save(tasks);
 
         ui.showLine();
-        ui.show("Got it! I've set the priority for this task:");
+        ui.show("Got it. I've set the priority for this task:");
         ui.show(task.toString());
         ui.showLine();
     }

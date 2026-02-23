@@ -48,7 +48,7 @@ public class ClearCommand extends Command {
 
         if (completedTasks.isEmpty()) {
             ui.showLine();
-            ui.show("No completed tasks to clear.");
+            ui.show("There are no completed tasks to clear. \n Wish I could help with your work.");
             ui.showLine();
             return;
         }
@@ -74,7 +74,7 @@ public class ClearCommand extends Command {
         ui.showLine();
         ui.show("Cleared " + removedCount + " completed task(s) and recorded in:");
         ui.show(normalizePathDisplay(completedFilePath));
-        ui.show("Your active task list has been updated.");
+        ui.show("Your active task list has been updated. Keep on fighting.");
         ui.showLine();
     }
 

@@ -39,7 +39,7 @@ public class ArchiveCommand extends Command {
 
         if (allTasks.isEmpty()) {
             ui.showLine();
-            ui.show("No tasks to archive. Your list is already empty.");
+            ui.show("Currently there are no tasks in the list.\n Come with at least one, then I will help you archive it.");
             ui.showLine();
             return;
         }
@@ -63,7 +63,7 @@ public class ArchiveCommand extends Command {
         ui.showLine();
         ui.show("Archived " + totalCount + " task(s) to:");
         ui.show(normalizePathDisplay(archiveFileName));
-        ui.show("Your task list has been cleared. Starting with a clean slate!");
+        ui.show("Your task list has been cleared. You may now start with a fresh slate.\n Or perhaps it's time to stop for a coffee break?");
         ui.showLine();
     }
 
@@ -113,7 +113,7 @@ public class ArchiveCommand extends Command {
                 writer.newLine();
             }
         } catch (IOException e) {
-            throw new ReiExceptions("OOPS!!! Unable to write to archive file: " + archiveFileName);
+            throw new ReiExceptions("Error detected: Unable to write to archive file: " + archiveFileName);
         }
     }
 }

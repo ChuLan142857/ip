@@ -61,14 +61,15 @@ public class SourceCommand extends Command {
                 PendingSourceCommand pendingCommand = new PendingSourceCommand(newFilePath);
                 throw new ConfirmationRequiredException(
                     "The file '" + newFilePath + "' doesn't exist.\n" +
-                    "Do you want to create a new data file at this location? (y/n)",
+                    "Do you want to create a new data file at this location?\n" +
+                    "Answer me with yes or no (y/n)",
                     pendingCommand
                 );
             }
             
             // File exists - just acknowledge the request
             ui.show("Switching data source to: " + newFilePath);
-            ui.show("Your current tasks will be saved before switching.");
+            ui.show("Don't worry, your current tasks will be saved before switching.");
         }
         
         ui.showLine();
